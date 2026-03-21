@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 220" width="680" height="220">
+  <defs>
+    <linearGradient id="ig" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B4A"/>
+      <stop offset="50%" stop-color="#D35230"/>
+      <stop offset="100%" stop-color="#A92B1A"/>
+    </linearGradient>
+    <linearGradient id="rg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B4A" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#A92B1A" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF6B4A"/>
+      <stop offset="100%" stop-color="#D35230"/>
+    </linearGradient>
+    <linearGradient id="ug" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#D35230" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#D35230" stop-opacity="0.12"/>
+    </linearGradient>
+    <radialGradient id="gbg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D35230" stop-opacity="0.18"/>
+      <stop offset="70%" stop-color="#D35230" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#D35230" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="gl">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="gl2">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="ds">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#A92B1A" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Subtle background -->
+  <rect width="680" height="220" fill="#0d1117" rx="12"/>
+  <rect width="680" height="220" fill="url(#ug)" rx="12"/>
+
+  <!-- Background glow behind icon -->
+  <circle cx="110" cy="110" r="85" fill="url(#gbg)">
+    <animate attributeName="r" values="75;95;75" dur="6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="6s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Orbit ring 1 — outer, slow -->
+  <ellipse cx="110" cy="110" rx="78" ry="78" fill="none" stroke="url(#rg1)" stroke-width="0.8" stroke-dasharray="6 10" opacity="0.35">
+    <animateTransform attributeName="transform" type="rotate" from="0 110 110" to="360 110 110" dur="28s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Orbit ring 2 — tilted -->
+  <ellipse cx="110" cy="110" rx="85" ry="50" fill="none" stroke="#C43E1C" stroke-width="0.5" stroke-dasharray="4 9" opacity="0.2" transform="rotate(-25 110 110)">
+    <animateTransform attributeName="transform" type="rotate" from="335 110 110" to="-25 110 110" dur="22s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Orbit ring 3 — inner, fast -->
+  <circle cx="110" cy="110" r="62" fill="none" stroke="#FF6B4A" stroke-width="0.35" stroke-dasharray="3 7" opacity="0.2">
+    <animateTransform attributeName="transform" type="rotate" from="0 110 110" to="-360 110 110" dur="14s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Orbiting dot 1 — big, glowing -->
+  <circle r="3.5" fill="#FF6B4A" filter="url(#gl)">
+    <animateMotion dur="7s" repeatCount="indefinite" path="M110,32 A78,78 0 1,1 109.99,32"/>
+    <animate attributeName="opacity" values="0.3;1;0.3" dur="7s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Orbiting dot 2 — counter -->
+  <circle r="2.2" fill="#D35230" filter="url(#gl)">
+    <animateMotion dur="9s" repeatCount="indefinite" path="M110,32 A78,78 0 1,0 109.99,32"/>
+    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="9s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Orbiting dot 3 — inner -->
+  <circle r="1.8" fill="#FF8A6A">
+    <animateMotion dur="5s" repeatCount="indefinite" path="M110,48 A62,62 0 1,1 109.99,48"/>
+    <animate attributeName="opacity" values="0.15;0.65;0.15" dur="5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Orbiting dot 4 — tilted orbit -->
+  <circle r="2" fill="#FF6B4A" opacity="0.4" filter="url(#gl)">
+    <animateMotion dur="11s" repeatCount="indefinite" path="M110,60 A85,50 0 1,1 109.99,60"/>
+  </circle>
+
+  <!-- Sparkles -->
+  <circle cx="48" cy="52" r="1" fill="#FF6B4A">
+    <animate attributeName="opacity" values="0;0.9;0" dur="3.2s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="0.3;1.8;0.3" dur="3.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="170" cy="58" r="1" fill="#D35230">
+    <animate attributeName="opacity" values="0;0.7;0" dur="4.1s" begin="1.2s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="0.3;1.4;0.3" dur="4.1s" begin="1.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="55" cy="170" r="1" fill="#FF8A6A">
+    <animate attributeName="opacity" values="0;0.6;0" dur="3.7s" begin="0.6s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="0.2;1.2;0.2" dur="3.7s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="160" cy="165" r="1" fill="#C43E1C">
+    <animate attributeName="opacity" values="0;0.8;0" dur="2.9s" begin="2.1s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="0.4;1.5;0.4" dur="2.9s" begin="2.1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Icon rect -->
+  <rect x="72" y="72" width="76" height="76" rx="19" fill="url(#ig)" filter="url(#ds)">
+    <animate attributeName="rx" values="19;22;19" dur="7s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- P letter -->
+  <text x="110" y="126" text-anchor="middle" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="50" font-weight="800" fill="white" filter="url(#gl)">P</text>
+
+  <!-- PowerPain text -->
+  <text x="220" y="100" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="52" font-weight="800" fill="white" letter-spacing="-1.5">Power</text>
+  <text x="420" y="100" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="52" font-weight="800" fill="url(#pg)" letter-spacing="-1.5">Pain</text>
+
+  <!-- Tagline -->
+  <text x="220" y="132" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#8b949e" letter-spacing="2.5" font-weight="400">FIX BROKEN FONTS IN PPTX</text>
+
+  <!-- Animated underline -->
+  <rect x="220" y="143" width="0" height="1.5" rx="1" fill="url(#pg)" opacity="0.5">
+    <animate attributeName="width" values="0;260;0" dur="6s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Tech badges row -->
+  <!-- Bun badge -->
+  <rect x="220" y="162" width="48" height="22" rx="4" fill="#1a1e24" stroke="#30363d" stroke-width="0.8"/>
+  <text x="244" y="177" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="10" fill="#8b949e" font-weight="500">Bun</text>
+
+  <!-- Hono badge -->
+  <rect x="276" y="162" width="52" height="22" rx="4" fill="#1a1e24" stroke="#30363d" stroke-width="0.8"/>
+  <text x="302" y="177" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="10" fill="#8b949e" font-weight="500">Hono</text>
+
+  <!-- TypeScript badge -->
+  <rect x="336" y="162" width="86" height="22" rx="4" fill="#1a1e24" stroke="#30363d" stroke-width="0.8"/>
+  <text x="379" y="177" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="10" fill="#8b949e" font-weight="500">TypeScript</text>
+
+  <!-- MIT badge -->
+  <rect x="430" y="162" width="42" height="22" rx="4" fill="#1a1e24" stroke="#30363d" stroke-width="0.8"/>
+  <text x="451" y="177" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="10" fill="#8b949e" font-weight="500">MIT</text>
+
+  <!-- v1.0 badge with accent -->
+  <rect x="480" y="162" width="42" height="22" rx="4" fill="#D35230" opacity="0.15" stroke="#D35230" stroke-width="0.5" stroke-opacity="0.3"/>
+  <text x="501" y="177" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="10" fill="#FF6B4A" font-weight="600">v1.0</text>
+</svg>
