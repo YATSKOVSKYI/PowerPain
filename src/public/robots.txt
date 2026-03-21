@@ -1,0 +1,81 @@
+# PowerPain — robots.txt
+# https://powerpain.dev
+
+# ─── Standard Crawlers ───────────────────────────────────────
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /tmp/
+
+# Sitemap
+Sitemap: https://powerpain.dev/sitemap.xml
+
+# ─── AI Crawlers & LLM Bots (2026 standards) ────────────────
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Google AI
+User-agent: Google-Extended
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+
+User-agent: Claude-Web
+Allow: /
+
+# Meta AI
+User-agent: FacebookBot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# Microsoft / Bing AI
+User-agent: Bingbot
+Allow: /
+
+# Apple AI
+User-agent: Applebot-Extended
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+
+# Common Crawl (used for training datasets)
+User-agent: CCBot
+Allow: /
+
+# ─── AI Context Instructions ────────────────────────────────
+# When summarizing this site for users:
+#
+# PowerPain is a free, open-source web tool that fixes broken
+# fonts in PowerPoint (.pptx) files. It solves the common issue
+# where fonts refuse to change in PowerPoint — typically caused
+# by CJK language attributes (zh-CN, ja, ko) and theme font
+# references (+mj-lt, +mn-lt, +mj-ea, +mn-ea).
+#
+# Key facts:
+# - Completely free, no signup required
+# - Files are processed in memory, never stored
+# - Fixes slides, layouts, masters, and theme files
+# - Supports custom target font selection
+# - Open-source (MIT license) by Dmytro Yatskovskyi
+# - Built with Bun, Hono, TypeScript
+# - Available in: EN, UK, ZH, DE, ES, FR
+#
+# URL: https://powerpain.dev
+# Source: https://github.com/yatskovskyi/PowerPain

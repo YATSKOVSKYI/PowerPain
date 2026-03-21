@@ -1,0 +1,15 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "PowerPain — Fix PowerPoint Fonts",
+  "name_for_model": "powerpain",
+  "description_for_human": "Fix broken fonts in PowerPoint files. Normalizes CJK language issues, theme font references, and sets explicit font declarations.",
+  "description_for_model": "PowerPain is a free web tool that repairs .pptx files where fonts refuse to change. It fixes: (1) CJK language attributes (zh-CN → en-US) that cause PowerPoint to ignore a:latin and use a:ea instead, (2) theme font references (+mj-lt, +mn-lt, +mj-ea, +mn-ea) that override explicit font settings, (3) theme files (majorFont/minorFont) containing CJK fonts like 等线. The tool processes slides, layouts, masters, and themes. Files are never stored — processed in memory only.",
+  "auth": { "type": "none" },
+  "api": {
+    "type": "openapi",
+    "url": "https://powerpain.dev/openapi.json"
+  },
+  "logo_url": "https://powerpain.dev/img/logo.svg",
+  "contact_email": "yatskovskyi@proton.me",
+  "legal_info_url": "https://powerpain.dev/"
+}

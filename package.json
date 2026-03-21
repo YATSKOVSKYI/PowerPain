@@ -1,0 +1,21 @@
+{
+  "name": "powerpain",
+  "version": "1.0.0",
+  "description": "Fix PowerPoint font issues in one click",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "dev": "bun --watch run src/server.ts"
+  },
+  "dependencies": {
+    "hono": "^4.7.0",
+    "jszip": "^3.10.1",
+    "@xmldom/xmldom": "^0.9.5",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.0",
+    "@types/qrcode": "^1.5.5"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary SEO -->
+  <title>PowerPain — Fix Broken PowerPoint Fonts Online | Free PPTX Font Repair Tool</title>
+  <meta name="description" content="Fix PowerPoint font issues instantly. Normalize CJK fonts, repair theme references (+mj-lt, +mn-lt), and fix zh-CN language bugs in .pptx files. Free, open-source, no signup required.">
+  <meta name="keywords" content="PowerPoint font fix, PPTX repair, CJK font fix, PowerPoint font not changing, fix Chinese fonts PowerPoint, normalize PowerPoint fonts, pptx font tool, theme font fix">
+  <meta name="author" content="Dmytro Yatskovskyi">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="canonical" href="https://powerpain.dev/">
+
+  <!-- Hreflang for multilingual SEO -->
+  <link rel="alternate" hreflang="en" href="https://powerpain.dev/">
+  <link rel="alternate" hreflang="uk" href="https://powerpain.dev/?lang=uk">
+  <link rel="alternate" hreflang="zh" href="https://powerpain.dev/?lang=zh">
+  <link rel="alternate" hreflang="de" href="https://powerpain.dev/?lang=de">
+  <link rel="alternate" hreflang="es" href="https://powerpain.dev/?lang=es">
+  <link rel="alternate" hreflang="ru" href="https://powerpain.dev/?lang=ru">
+  <link rel="alternate" hreflang="fr" href="https://powerpain.dev/?lang=fr">
+  <link rel="alternate" hreflang="x-default" href="https://powerpain.dev/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PowerPain">
+  <meta property="og:title" content="PowerPain — Fix Broken PowerPoint Fonts Online">
+  <meta property="og:description" content="Font won't change in PowerPoint? Upload your .pptx — we fix CJK fonts, theme references, and language bugs in seconds. Free & open-source.">
+  <meta property="og:url" content="https://powerpain.dev/">
+  <meta property="og:image" content="https://powerpain.dev/img/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="uk_UA">
+  <meta property="og:locale:alternate" content="zh_CN">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="og:locale:alternate" content="es_ES">
+  <meta property="og:locale:alternate" content="fr_FR">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PowerPain — Fix Broken PowerPoint Fonts">
+  <meta name="twitter:description" content="Font won't change in PowerPoint? Upload your .pptx — fixed in seconds. Free & open-source.">
+  <meta name="twitter:image" content="https://powerpain.dev/img/og-cover.png">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PowerPain",
+    "url": "https://powerpain.dev",
+    "description": "Fix broken fonts in PowerPoint files. Normalize CJK fonts, theme font references, and language issues in .pptx files instantly.",
+    "applicationCategory": "Utility",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Dmytro Yatskovskyi",
+      "url": "https://github.com/yatskovskyi"
+    },
+    "license": "https://opensource.org/licenses/MIT",
+    "browserRequirements": "Requires a modern web browser",
+    "softwareVersion": "1.0.0",
+    "featureList": [
+      "Fix CJK font issues (zh-CN, ja, ko)",
+      "Normalize theme font references (+mj-lt, +mn-lt, +mj-ea, +mn-ea)",
+      "Set explicit a:latin and a:ea typeface",
+      "Process slides, layouts, masters, and themes",
+      "No signup, no storage, instant processing"
+    ],
+    "screenshot": "https://powerpain.dev/img/og-cover.png"
+  }
+  </script>
+
+  <!-- FAQ Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Why won't fonts change in PowerPoint?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "PowerPoint ignores explicit font settings when the slide language is set to CJK (zh-CN, ja, ko) or when fonts reference theme placeholders like +mj-lt, +mn-lt. PowerPain fixes both issues by normalizing language attributes and replacing theme references with explicit font declarations."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is PowerPain free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, PowerPain is completely free and open-source under the MIT license. No signup, no account, no subscription required."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Are my files stored on the server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Files are processed in memory and never saved to disk. All temporary data is deleted immediately after processing completes."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Fonts & Styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23C43E1C'/%3E%3Ctext x='16' y='24' text-anchor='middle' font-family='Arial' font-size='22' font-weight='bold' fill='white'%3EP%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <meta name="theme-color" content="#080808">
+  <meta name="color-scheme" content="dark">
+</head>
+<body>
+
+  <!-- ═══ Navigation ═══ -->
+  <nav class="nav">
+    <a href="#" class="nav__logo">
+      <svg class="nav__logo-svg" viewBox="0 0 32 32" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="nav-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#D35230"/>
+            <stop offset="100%" stop-color="#A92B1A"/>
+          </linearGradient>
+          <filter id="nav-glow">
+            <feGaussianBlur stdDeviation="1.5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <rect width="32" height="32" rx="8" fill="url(#nav-grad)" filter="url(#nav-glow)"/>
+        <text x="16" y="24" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="21" font-weight="800" fill="white" opacity="0.95">P</text>
+        <circle cx="16" cy="16" r="14.5" fill="none" stroke="#FF6B4A" stroke-width="0.4" opacity="0.3" stroke-dasharray="3 3">
+          <animateTransform attributeName="transform" type="rotate" from="0 16 16" to="360 16 16" dur="12s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="1" fill="#FF6B4A" opacity="0.7">
+          <animateMotion dur="4s" repeatCount="indefinite" path="M16,1.5 A14.5,14.5 0 1,1 15.99,1.5"/>
+        </circle>
+      </svg>
+      <span>PowerPain</span>
+    </a>
+    <div class="nav__right">
+      <a href="https://github.com/yatskovskyi" target="_blank" rel="noopener" class="nav__github" title="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+      <div class="lang-switcher" id="langSwitcher">
+        <button class="lang-btn" id="langBtn">
+          <span id="langCurrent">EN</span>
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4l4 4 4-4"/></svg>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+          <button class="lang-option active" data-lang="en">English</button>
+          <button class="lang-option" data-lang="ru">Русский</button>
+          <button class="lang-option" data-lang="uk">Українська</button>
+          <button class="lang-option" data-lang="zh">中文</button>
+          <button class="lang-option" data-lang="de">Deutsch</button>
+          <button class="lang-option" data-lang="es">Español</button>
+          <button class="lang-option" data-lang="fr">Français</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ Hero ═══ -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__content">
+        <div class="hero__badge">
+          <span class="hero__badge-dot"></span>
+          <span data-i18n="badge">Open-source tool</span>
+        </div>
+        <h1 class="hero__title">
+          <span data-i18n="heroLine1">Font won't change</span><br>
+          <span data-i18n="heroLine2">in </span><span class="highlight glitch" data-text="PowerPoint">PowerPoint</span><span class="highlight">?</span>
+        </h1>
+        <p class="hero__subtitle" data-i18n="heroSub">Upload your broken .pptx file — we'll normalize all fonts, fix CJK issues, and clean up theme references. In seconds.</p>
+        <a href="#tool" class="hero__cta">
+          <span data-i18n="heroCta">Fix it now</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M4 9l4 4 4-4"/></svg>
+        </a>
+      </div>
+      <div class="hero__animation">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="ppt-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#D35230"/>
+              <stop offset="100%" stop-color="#A92B1A"/>
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="12" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="soft-glow">
+              <feGaussianBlur stdDeviation="20" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Background glow -->
+          <circle cx="200" cy="200" r="100" fill="#C43E1C" filter="url(#soft-glow)" opacity="0.15">
+            <animate attributeName="r" values="90;110;90" dur="5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.1;0.2;0.1" dur="5s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Orbit ring 1 -->
+          <circle cx="200" cy="200" r="145" fill="none" stroke="#C43E1C" stroke-width="0.6" opacity="0.15" stroke-dasharray="8 6">
+            <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="40s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Orbit ring 2 -->
+          <circle cx="200" cy="200" r="165" fill="none" stroke="#C43E1C" stroke-width="0.4" opacity="0.1" stroke-dasharray="4 8">
+            <animateTransform attributeName="transform" type="rotate" from="360 200 200" to="0 200 200" dur="30s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Orbit ring 3 (inner) -->
+          <circle cx="200" cy="200" r="120" fill="none" stroke="#C43E1C" stroke-width="0.5" opacity="0.08" stroke-dasharray="2 12">
+            <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="20s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Orbiting dots -->
+          <circle r="3" fill="#D35230" opacity="0.9" filter="url(#glow)">
+            <animateMotion dur="10s" repeatCount="indefinite" path="M200,55 A145,145 0 1,1 199.99,55"/>
+          </circle>
+          <circle r="2.5" fill="#FF6B4A" opacity="0.7" filter="url(#glow)">
+            <animateMotion dur="14s" repeatCount="indefinite" path="M200,35 A165,165 0 1,0 199.99,35"/>
+          </circle>
+          <circle r="2" fill="#D35230" opacity="0.6">
+            <animateMotion dur="8s" repeatCount="indefinite" path="M200,80 A120,120 0 1,1 199.99,80"/>
+          </circle>
+          <circle r="1.5" fill="#FF8A65" opacity="0.5">
+            <animateMotion dur="18s" repeatCount="indefinite" path="M200,55 A145,145 0 1,0 199.99,55"/>
+          </circle>
+          <circle r="3.5" fill="#C43E1C" opacity="0.4" filter="url(#glow)">
+            <animateMotion dur="25s" repeatCount="indefinite" path="M200,35 A165,165 0 1,1 199.99,35"/>
+          </circle>
+
+          <!-- PowerPoint icon — rounded rect -->
+          <g filter="url(#glow)">
+            <rect x="148" y="148" width="104" height="104" rx="22" fill="url(#ppt-grad)"/>
+          </g>
+
+          <!-- P letter -->
+          <text x="200" y="224" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="68" font-weight="800" fill="white" opacity="0.95">P</text>
+
+          <!-- Subtle floating particles -->
+          <circle cx="80" cy="120" r="1.2" fill="#C43E1C" opacity="0.3">
+            <animate attributeName="cy" values="120;100;120" dur="6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.3;0.1;0.3" dur="6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="320" cy="280" r="1" fill="#D35230" opacity="0.25">
+            <animate attributeName="cy" values="280;260;280" dur="7s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="300" cy="100" r="1.5" fill="#FF6B4A" opacity="0.2">
+            <animate attributeName="cy" values="100;85;100" dur="5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="100" cy="300" r="1" fill="#C43E1C" opacity="0.2">
+            <animate attributeName="cy" values="300;285;300" dur="8s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Tool ═══ -->
+  <section class="tool" id="tool">
+    <div class="container">
+      <div class="tool__header">
+        <div class="tool__label" data-i18n="toolLabel">Upload &amp; Fix</div>
+        <h2 class="tool__title" data-i18n="toolTitle">Drop your file below</h2>
+      </div>
+
+      <div class="tool__card">
+        <!-- Dropzone -->
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="dropzone__title" data-i18n="dropTitle">Drop .pptx file here</div>
+          <div class="dropzone__text" data-i18n="dropText">or click to browse</div>
+          <input type="file" class="file-input" id="fileInput" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation">
+        </div>
+
+        <!-- File info -->
+        <div class="file-info" id="fileInfo">
+          <div class="file-info__icon">P</div>
+          <div class="file-info__details">
+            <div class="file-info__name" id="fileName"></div>
+            <div class="file-info__size" id="fileSize"></div>
+          </div>
+          <button class="file-info__remove" id="fileRemove" title="Remove">&times;</button>
+        </div>
+
+        <!-- Font select -->
+        <div class="font-field">
+          <label class="font-label" for="fontSelect" data-i18n="fontLabel">Target font</label>
+          <select class="font-select" id="fontSelect">
+            <option value="Arial" selected>Arial</option>
+            <option value="Calibri">Calibri</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Segoe UI">Segoe UI</option>
+            <option value="Roboto">Roboto</option>
+            <option value="Open Sans">Open Sans</option>
+            <option value="Inter">Inter</option>
+          </select>
+        </div>
+
+        <!-- Process -->
+        <button class="btn-process" id="btnProcess" disabled data-i18n="btnProcess">Fix Fonts</button>
+
+        <!-- Status -->
+        <div class="status" id="status">
+          <div class="status-bar" id="statusBar">
+            <span id="statusIcon"></span>
+            <span id="statusText"></span>
+          </div>
+        </div>
+
+        <!-- Download -->
+        <div class="download-area" id="downloadArea">
+          <button class="btn-download" id="btnDownload" data-i18n="btnDownload">Download Fixed File</button>
+          <div class="stats-text" id="statsText"></div>
+          <button class="btn-reset" id="btnReset" data-i18n="btnReset">Process another file</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Features ═══ -->
+  <section class="features">
+    <div class="container">
+      <div class="features__header">
+        <div class="features__label" data-i18n="featuresLabel">How it works</div>
+        <h2 class="features__title" data-i18n="featuresTitle">Three simple steps</h2>
+      </div>
+      <div class="features__grid">
+        <div class="feature">
+          <div class="feature__step">1</div>
+          <h3 class="feature__title" data-i18n="step1Title">Upload</h3>
+          <p class="feature__text" data-i18n="step1Text">Drag and drop your .pptx file or click to browse. Up to 100 MB.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__step">2</div>
+          <h3 class="feature__title" data-i18n="step2Title">Process</h3>
+          <p class="feature__text" data-i18n="step2Text">We normalize fonts in slides, layouts, masters, and themes. Fix CJK issues and theme references.</p>
+        </div>
+        <div class="feature">
+          <div class="feature__step">3</div>
+          <h3 class="feature__title" data-i18n="step3Title">Download</h3>
+          <p class="feature__text" data-i18n="step3Text">Get your fixed file instantly. All temporary data is deleted right after processing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Privacy ═══ -->
+  <section class="privacy">
+    <div class="container">
+      <div class="privacy__card">
+        <svg class="privacy__icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"/></svg>
+        <span data-i18n="privacy">Your files are processed on the server and deleted immediately after. Nothing is stored, logged, or shared.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Donate ═══ -->
+  <section class="donate" id="donate">
+    <div class="container">
+      <div class="donate__banner">
+        <div class="donate__photo-wrap" id="photoWrap">
+          <img src="/img/donate-photo.webp" alt="Support the developer" class="donate__photo" onerror="document.getElementById('photoWrap').classList.add('hidden')">
+        </div>
+        <h2 class="donate__headline">
+          <span data-i18n="donateHeadline1">This takes hours.</span><br>
+          <span data-i18n="donateHeadline2">Your donation is </span><span class="fuel" data-i18n="donateFuel">fuel</span><span class="fuel">.</span>
+        </h2>
+        <p class="donate__sub">USDT &middot; TRC-20 &middot; TRON</p>
+      </div>
+
+      <div class="donate__label">
+        <span data-i18n="donateLabel">Support the project</span>
+      </div>
+
+      <h3 class="donate__content-title" data-i18n="donateCTitle">Liked the tool?</h3>
+      <p class="donate__content-text" data-i18n="donateCText">This is a free open-source project. If it saved you time on a thesis or an article — support the development with a few USDT.</p>
+
+      <div class="donate__card">
+        <div>
+          <div class="donate__qr">
+            <img src="/api/qr" alt="QR Code" id="qrImage">
+          </div>
+          <div class="donate__qr-label">Scan to donate</div>
+        </div>
+        <div class="donate__info">
+          <div class="donate__network">
+            <span class="donate__network-dot"></span>
+            USDT &middot; TRC-20
+          </div>
+          <div class="donate__crypto-title" data-i18n="cryptoTitle">Cryptocurrency USDT</div>
+          <div class="donate__crypto-desc" data-i18n="cryptoDesc">TRON network (TRC-20). Only USDT — other assets will be lost.</div>
+          <div class="donate__address-row">
+            <div class="donate__address" id="walletAddress">TBxEquczDy6ZSRPAyYrNbczoaP9YThaJuZ</div>
+            <button class="btn-copy" id="btnCopy" data-i18n="btnCopy">Copy</button>
+          </div>
+          <div class="donate__warning">
+            <strong data-i18n="warningLabel">Warning:</strong>
+            <span data-i18n="warningText"> send only TRON network assets to this address.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Footer ═══ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__inner">
+        <span class="footer__text">&copy; 2026 PowerPain</span>
+        <div class="footer__sep"></div>
+        <a href="https://github.com/yatskovskyi" target="_blank" rel="noopener" class="footer__link">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>YATSKOVSKYI</span>
+        </a>
+        <div class="footer__sep"></div>
+        <span class="footer__text">MIT License</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══ Scroll to top — "Pain Killer" pill button ═══ -->
+  <button class="painkiller" id="painkiller" title="Back to top — kill the pain">
+    <svg viewBox="0 0 40 40" width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <!-- Pill capsule shape -->
+      <rect x="10" y="6" width="20" height="28" rx="10" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.9"/>
+      <rect x="10" y="6" width="20" height="14" rx="10" fill="currentColor" opacity="0.25"/>
+      <line x1="10" y1="20" x2="30" y2="20" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+      <!-- Arrow up inside pill -->
+      <path d="M20 27 L20 15 M15 19 L20 14 L25 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    </svg>
+    <span class="painkiller__label" data-i18n="painkiller">pain killer</span>
+  </button>
+
+  <script src="/app.js"></script>
+</body>
+</html>
