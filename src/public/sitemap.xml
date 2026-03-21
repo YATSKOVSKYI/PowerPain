@@ -2,16 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://powerpain.dev/</loc>
+    <loc>https://powerpain.yatskovskyi.top/</loc>
     <lastmod>2026-03-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://powerpain.dev/"/>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://powerpain.dev/?lang=uk"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://powerpain.dev/?lang=zh"/>
-    <xhtml:link rel="alternate" hreflang="de" href="https://powerpain.dev/?lang=de"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://powerpain.dev/?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://powerpain.dev/?lang=fr"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://powerpain.dev/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://powerpain.yatskovskyi.top/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://powerpain.yatskovskyi.top/?lang=uk"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://powerpain.yatskovskyi.top/?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://powerpain.yatskovskyi.top/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://powerpain.yatskovskyi.top/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://powerpain.yatskovskyi.top/?lang=ru"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://powerpain.yatskovskyi.top/?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://powerpain.yatskovskyi.top/"/>
   </url>
 </urlset>

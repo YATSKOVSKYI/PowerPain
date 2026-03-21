@@ -1,32 +1,131 @@
 <div align="center">
 
 <!-- Animated SVG Logo -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="400" height="160">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 260" width="520" height="260">
   <defs>
-    <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#D35230"/>
+    <!-- Gradients -->
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B4A"/>
+      <stop offset="50%" stop-color="#D35230"/>
       <stop offset="100%" stop-color="#A92B1A"/>
     </linearGradient>
-    <filter id="g">
-      <feGaussianBlur stdDeviation="6" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B4A" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#A92B1A" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E0E0E0"/>
+    </linearGradient>
+    <linearGradient id="painGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF6B4A"/>
+      <stop offset="100%" stop-color="#D35230"/>
+    </linearGradient>
+    <radialGradient id="glowBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D35230" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#D35230" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Filters -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="iconShadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#A92B1A" flood-opacity="0.5"/>
     </filter>
   </defs>
-  <circle cx="60" cy="80" r="50" fill="#D35230" opacity="0.08">
-    <animate attributeName="r" values="45;55;45" dur="4s" repeatCount="indefinite"/>
+
+  <!-- Background glow pulse -->
+  <circle cx="100" cy="110" r="90" fill="url(#glowBg)">
+    <animate attributeName="r" values="80;100;80" dur="5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="5s" repeatCount="indefinite"/>
   </circle>
-  <circle cx="60" cy="80" r="56" fill="none" stroke="#C43E1C" stroke-width="0.5" opacity="0.2" stroke-dasharray="6 4">
-    <animateTransform attributeName="transform" type="rotate" from="0 60 80" to="360 60 80" dur="20s" repeatCount="indefinite"/>
+
+  <!-- Outer orbit ring 1 — slow rotation -->
+  <ellipse cx="100" cy="110" rx="72" ry="72" fill="none" stroke="url(#ringGrad)" stroke-width="0.8" stroke-dasharray="8 12" opacity="0.3">
+    <animateTransform attributeName="transform" type="rotate" from="0 100 110" to="360 100 110" dur="30s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Outer orbit ring 2 — tilted, reverse -->
+  <ellipse cx="100" cy="110" rx="80" ry="55" fill="none" stroke="#C43E1C" stroke-width="0.5" stroke-dasharray="4 8" opacity="0.2" transform="rotate(-20 100 110)">
+    <animateTransform attributeName="transform" type="rotate" from="360 100 110" to="0 100 110" dur="25s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Inner orbit ring — fast -->
+  <circle cx="100" cy="110" r="58" fill="none" stroke="#FF6B4A" stroke-width="0.4" stroke-dasharray="3 6" opacity="0.25">
+    <animateTransform attributeName="transform" type="rotate" from="0 100 110" to="-360 100 110" dur="15s" repeatCount="indefinite"/>
   </circle>
-  <circle r="2" fill="#D35230" opacity="0.8" filter="url(#g)">
-    <animateMotion dur="6s" repeatCount="indefinite" path="M60,24 A56,56 0 1,1 59.99,24"/>
+
+  <!-- Orbiting particle 1 — large, glowing -->
+  <circle r="3" fill="#FF6B4A" opacity="0.9" filter="url(#glow)">
+    <animateMotion dur="6s" repeatCount="indefinite" path="M100,38 A72,72 0 1,1 99.99,38"/>
+    <animate attributeName="opacity" values="0.4;1;0.4" dur="6s" repeatCount="indefinite"/>
   </circle>
-  <circle r="1.5" fill="#FF6B4A" opacity="0.5">
-    <animateMotion dur="9s" repeatCount="indefinite" path="M60,24 A56,56 0 1,0 59.99,24"/>
+
+  <!-- Orbiting particle 2 — medium, counter-clockwise -->
+  <circle r="2" fill="#D35230" opacity="0.7" filter="url(#glow)">
+    <animateMotion dur="8s" repeatCount="indefinite" path="M100,38 A72,72 0 1,0 99.99,38"/>
+    <animate attributeName="opacity" values="0.3;0.8;0.3" dur="8s" repeatCount="indefinite"/>
   </circle>
-  <rect x="28" y="48" width="64" height="64" rx="14" fill="url(#rg)" filter="url(#g)"/>
-  <text x="60" y="94" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" font-weight="bold" fill="white">P</text>
-  <text x="140" y="92" font-family="Arial,sans-serif" font-size="38" font-weight="800" fill="white">PowerPain</text>
+
+  <!-- Orbiting particle 3 — small, inner orbit -->
+  <circle r="1.5" fill="#FF8A6A" opacity="0.6">
+    <animateMotion dur="4.5s" repeatCount="indefinite" path="M100,52 A58,58 0 1,1 99.99,52"/>
+    <animate attributeName="opacity" values="0.2;0.7;0.2" dur="4.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Orbiting particle 4 — tilted orbit -->
+  <circle r="1.8" fill="#FF6B4A" opacity="0.5" filter="url(#glow)">
+    <animateMotion dur="10s" repeatCount="indefinite" path="M100,30 A80,55 0 1,1 99.99,30"/>
+  </circle>
+
+  <!-- Floating sparkles -->
+  <circle cx="45" cy="55" r="1" fill="#FF6B4A" opacity="0">
+    <animate attributeName="opacity" values="0;0.8;0" dur="3s" begin="0s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="0.5;1.5;0.5" dur="3s" begin="0s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="155" cy="65" r="1" fill="#D35230" opacity="0">
+    <animate attributeName="opacity" values="0;0.6;0" dur="4s" begin="1.5s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="0.5;1.2;0.5" dur="4s" begin="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="60" cy="165" r="1" fill="#FF8A6A" opacity="0">
+    <animate attributeName="opacity" values="0;0.5;0" dur="3.5s" begin="0.8s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="0.3;1;0.3" dur="3.5s" begin="0.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="148" cy="155" r="1" fill="#C43E1C" opacity="0">
+    <animate attributeName="opacity" values="0;0.7;0" dur="2.8s" begin="2s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="0.5;1.3;0.5" dur="2.8s" begin="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Icon background — rounded rect with shadow -->
+  <rect x="64" y="74" width="72" height="72" rx="18" fill="url(#iconGrad)" filter="url(#iconShadow)">
+    <animate attributeName="rx" values="18;20;18" dur="6s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Icon "P" letter -->
+  <text x="100" y="125" text-anchor="middle" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="48" font-weight="800" fill="white" filter="url(#glow)">P</text>
+
+  <!-- "Power" text -->
+  <text x="200" y="108" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="44" font-weight="800" fill="url(#textGrad)" letter-spacing="-1">Power</text>
+
+  <!-- "Pain" text — accent color -->
+  <text x="370" y="108" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="44" font-weight="800" fill="url(#painGrad)" letter-spacing="-1">Pain</text>
+
+  <!-- Tagline -->
+  <text x="200" y="138" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="14" fill="#999" letter-spacing="3" font-weight="400">FIX BROKEN FONTS IN POWERPOINT</text>
+
+  <!-- Decorative line under tagline -->
+  <line x1="200" y1="148" x2="480" y2="148" stroke="url(#ringGrad)" stroke-width="1" opacity="0.4">
+    <animate attributeName="x2" values="200;480;200" dur="8s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- Version badge -->
+  <rect x="200" y="158" width="44" height="18" rx="9" fill="#D35230" opacity="0.15"/>
+  <text x="222" y="171" text-anchor="middle" font-family="'SF Mono','Fira Code',monospace" font-size="9" fill="#FF6B4A" font-weight="600">v1.0</text>
 </svg>
 
 <br/>
@@ -42,6 +141,7 @@
 
 <p>
   <b>EN</b> · Font won't change in PowerPoint? We fix it.<br/>
+  <b>RU</b> · Шрифт не меняется в PowerPoint? Мы починим.<br/>
   <b>UK</b> · Шрифт не змінюється в PowerPoint? Ми виправимо.<br/>
   <b>ZH</b> · PowerPoint 中字体无法更改？我们来修复。<br/>
   <b>DE</b> · Schriftart ändert sich nicht in PowerPoint? Wir reparieren es.<br/>
@@ -71,7 +171,7 @@ PowerPoint silently ignores your font changes in three common scenarios:
 - **Theme repair** — fixes `majorFont`/`minorFont` in theme files
 - **11 font choices** — Arial, Calibri, Times New Roman, Helvetica, Verdana, Tahoma, Georgia, Segoe UI, Roboto, Open Sans, Inter
 - **Zero storage** — files processed in memory, never saved to disk
-- **6 languages** — EN, UK, ZH, DE, ES, FR
+- **7 languages** — EN, RU, UK, ZH, DE, ES, FR
 - **Privacy-first** — no accounts, no tracking, no analytics
 - **Modern UI** — dark theme, PowerPoint color palette, responsive design
 
@@ -196,7 +296,7 @@ Issues and PRs welcome at [github.com/yatskovskyi/PowerPain](https://github.com/
 
 <div align="center">
 
-**If PowerPain saved your day — consider [supporting the project](https://powerpain.dev/#donate) ❤️**
+**If PowerPain saved your day — consider [supporting the project](https://powerpain.yatskovskyi.top/#donate) ❤️**
 
 `USDT (TRC-20): TBxEquczDy6ZSRPAyYrNbczoaP9YThaJuZ`
 

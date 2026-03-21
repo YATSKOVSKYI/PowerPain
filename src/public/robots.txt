@@ -1,5 +1,5 @@
 # PowerPain — robots.txt
-# https://powerpain.dev
+# https://powerpain.yatskovskyi.top
 
 # ─── Standard Crawlers ───────────────────────────────────────
 User-agent: *
@@ -8,7 +8,7 @@ Disallow: /api/
 Disallow: /tmp/
 
 # Sitemap
-Sitemap: https://powerpain.dev/sitemap.xml
+Sitemap: https://powerpain.yatskovskyi.top/sitemap.xml
 
 # ─── AI Crawlers & LLM Bots (2026 standards) ────────────────
 
@@ -77,5 +77,5 @@ Allow: /
 # - Built with Bun, Hono, TypeScript
 # - Available in: EN, UK, ZH, DE, ES, FR
 #
-# URL: https://powerpain.dev
+# URL: https://powerpain.yatskovskyi.top
 # Source: https://github.com/yatskovskyi/PowerPain

@@ -7,9 +7,9 @@
   "auth": { "type": "none" },
   "api": {
     "type": "openapi",
-    "url": "https://powerpain.dev/openapi.json"
+    "url": "https://powerpain.yatskovskyi.top/openapi.json"
   },
-  "logo_url": "https://powerpain.dev/img/logo.svg",
+  "logo_url": "https://powerpain.yatskovskyi.top/img/logo.svg",
   "contact_email": "yatskovskyi@proton.me",
-  "legal_info_url": "https://powerpain.dev/"
+  "legal_info_url": "https://powerpain.yatskovskyi.top/"
 }
