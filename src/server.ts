@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
+import { existsSync } from "node:fs";
 import QRCode from "qrcode";
 import { normalizePptxBuffer } from "./pptx-normalizer";
 import { removeTempFile, startCleanupTimer } from "./cleanup";
@@ -127,7 +128,7 @@ app.use("*", async (c, next) => {
 // ─── Job store for async processing with polling ────────────────────────────
 
 interface Job {
-  status: "processing" | "done" | "error";
+  status: "uploading" | "processing" | "done" | "error";
   stage: string;
   message: string;
   percent: number;
@@ -136,6 +137,13 @@ interface Job {
   stats?: import("./pptx-normalizer").NormalizeStats;
   error?: string;
   createdAt: number;
+  // Chunked upload state
+  totalChunks: number;
+  receivedChunks: number;
+  totalSize: number;
+  uploadDir?: string;
+  targetFont: string;
+  originalName: string;
 }
 
 const jobStore = new Map<string, Job>();
@@ -146,141 +154,207 @@ setInterval(() => {
   for (const [id, job] of jobStore) {
     if (now - job.createdAt > 15 * 60 * 1000) {
       if (job.filePath) removeTempFile(job.filePath);
+      if (job.uploadDir) rm(job.uploadDir, { recursive: true, force: true }).catch(() => {});
       jobStore.delete(id);
     }
   }
 }, 60 * 1000).unref();
 
-app.post("/api/process", async (c) => {
+// Step 1: Init upload — returns jobId and tells client how many chunks to send
+app.post("/api/upload/init", async (c) => {
   const requestId = crypto.randomUUID().slice(0, 8);
 
   try {
-    // Rate limiting
     const clientIp =
       c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
       c.req.header("x-real-ip") ||
       "unknown";
 
     if (isRateLimited(clientIp)) {
-      console.log(`[${requestId}] Rate limited: ${clientIp}`);
       return c.json({ error: "Too many requests. Please try again later." }, 429);
     }
 
-    const contentType = c.req.header("content-type") || "";
-    if (!contentType.includes("multipart/form-data")) {
-      return c.json({ error: "Expected multipart/form-data" }, 400);
+    const body = await c.req.json();
+    const { fileName, fileSize, targetFont } = body as {
+      fileName: string;
+      fileSize: number;
+      targetFont: string;
+    };
+
+    if (!fileName || !fileSize) {
+      return c.json({ error: "Missing fileName or fileSize" }, 400);
     }
 
-    const formData = await c.req.formData();
-    const file = formData.get("file");
-    const targetFont = (formData.get("targetFont") as string) || "Arial";
-
-    if (!file || !(file instanceof File)) {
-      return c.json({ error: "No file uploaded" }, 400);
-    }
-
-    if (!ALLOWED_FONTS.includes(targetFont)) {
-      return c.json({ error: `Font not allowed. Choose from: ${ALLOWED_FONTS.join(", ")}` }, 400);
-    }
-
-    if (!file.name.toLowerCase().endsWith(".pptx")) {
+    if (!fileName.toLowerCase().endsWith(".pptx")) {
       return c.json({ error: "Only .pptx files are accepted" }, 400);
     }
 
-    const validMimes = [
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "application/octet-stream",
-      "application/zip",
-    ];
-    if (!validMimes.includes(file.type)) {
-      return c.json({ error: "Invalid file type" }, 400);
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
+    if (fileSize > MAX_FILE_SIZE) {
       return c.json({ error: `File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024} MB` }, 400);
     }
 
-    console.log(`[${requestId}] Upload started: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`);
-
-    const arrayBuffer = await file.arrayBuffer();
-    const inputBuffer = Buffer.from(arrayBuffer);
-
-    if (inputBuffer[0] !== 0x50 || inputBuffer[1] !== 0x4b) {
-      return c.json({ error: "File is not a valid PPTX archive" }, 400);
+    const font = targetFont || "Arial";
+    if (!ALLOWED_FONTS.includes(font)) {
+      return c.json({ error: `Font not allowed. Choose from: ${ALLOWED_FONTS.join(", ")}` }, 400);
     }
 
-    const baseName = file.name.replace(/\.pptx$/i, "");
-    const outputName = `${baseName}-fixed.pptx`;
+    const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB chunks
+    const totalChunks = Math.ceil(fileSize / CHUNK_SIZE);
 
-    // Create job and start processing in background
+    // Create upload directory for this job
+    const uploadDir = join(TEMP_DIR, `upload-${requestId}`);
+    await mkdir(uploadDir, { recursive: true });
+
     const job: Job = {
-      status: "processing",
+      status: "uploading",
       stage: "upload",
-      message: "File received, unpacking archive...",
-      percent: 5,
+      message: "Waiting for file chunks...",
+      percent: 0,
+      totalChunks,
+      receivedChunks: 0,
+      totalSize: fileSize,
+      uploadDir,
+      targetFont: font,
+      originalName: fileName,
       createdAt: Date.now(),
     };
     jobStore.set(requestId, job);
 
-    console.log(`[${requestId}] Processing started, font: ${targetFont}`);
+    console.log(`[${requestId}] Upload init: ${fileName} (${(fileSize / 1024 / 1024).toFixed(1)} MB, ${totalChunks} chunks)`);
 
-    // Return immediately with jobId — processing runs async
-    const processAsync = async () => {
-      try {
-        const { output, stats } = await normalizePptxBuffer(inputBuffer, { targetFont }, (stage, current, total) => {
-          const stageMap: Record<string, { msg: string; base: number; weight: number }> = {
-            unzip:   { msg: "Unpacking PPTX archive...", base: 5, weight: 10 },
-            themes:  { msg: `Fixing themes (${current + 1}/${total})...`, base: 15, weight: 5 },
-            slides:  { msg: `Fixing slides (${current + 1}/${total})...`, base: 20, weight: 40 },
-            layouts: { msg: `Fixing layouts (${current + 1}/${total})...`, base: 60, weight: 10 },
-            masters: { msg: `Fixing masters (${current + 1}/${total})...`, base: 70, weight: 5 },
-            zip:     { msg: "Compressing fixed file...", base: 75, weight: 20 },
-          };
-          const s = stageMap[stage];
-          if (s) {
-            const stagePercent = total > 0 ? current / total : 0;
-            job.stage = stage;
-            job.message = s.msg;
-            job.percent = Math.round(s.base + s.weight * stagePercent);
-          }
-        });
-
-        job.message = "Saving result...";
-        job.percent = 95;
-
-        const tempPath = join(TEMP_DIR, `${requestId}.pptx`);
-        await Bun.write(tempPath, output);
-
-        job.status = "done";
-        job.percent = 100;
-        job.message = "Done!";
-        job.fileName = outputName;
-        job.filePath = tempPath;
-        job.stats = stats;
-
-        console.log(
-          `[${requestId}] Processing finished: ${stats.themes} theme(s), ${stats.masters} master(s), ${stats.layouts} layout(s), ${stats.slides} slide(s)`
-        );
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        console.error(`[${requestId}] Error:`, message);
-        job.status = "error";
-        job.message = "Processing failed. The file may be corrupted or not a valid PPTX.";
-        job.error = job.message;
-      }
-    };
-
-    // Fire-and-forget — don't await
-    processAsync();
-
-    return c.json({ jobId: requestId });
+    return c.json({ jobId: requestId, chunkSize: CHUNK_SIZE, totalChunks });
 
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    console.error(`[${requestId}] Error:`, message);
-    return c.json({ error: "Processing failed. The file may be corrupted or not a valid PPTX." }, 500);
+    console.error(`[${requestId}] Init error:`, err);
+    return c.json({ error: "Failed to initialize upload" }, 500);
   }
 });
+
+// Step 2: Upload a single chunk
+app.post("/api/upload/:id/chunk/:index", async (c) => {
+  const id = c.req.param("id");
+  const index = parseInt(c.req.param("index"), 10);
+  const job = jobStore.get(id);
+
+  if (!job || !job.uploadDir) {
+    return c.json({ error: "Job not found or expired." }, 404);
+  }
+
+  if (job.status !== "uploading") {
+    return c.json({ error: "Upload already completed." }, 400);
+  }
+
+  if (isNaN(index) || index < 0 || index >= job.totalChunks) {
+    return c.json({ error: "Invalid chunk index." }, 400);
+  }
+
+  try {
+    const chunkData = Buffer.from(await c.req.arrayBuffer());
+    const chunkPath = join(job.uploadDir, `chunk-${String(index).padStart(6, "0")}`);
+    await writeFile(chunkPath, chunkData);
+
+    job.receivedChunks++;
+    const uploadPercent = Math.round((job.receivedChunks / job.totalChunks) * 40); // Upload = 0-40%
+    job.percent = uploadPercent;
+    job.message = `Uploading... (${job.receivedChunks}/${job.totalChunks} chunks)`;
+
+    // All chunks received — start processing
+    if (job.receivedChunks >= job.totalChunks) {
+      job.message = "All chunks received, assembling file...";
+      job.percent = 40;
+      job.status = "processing";
+
+      // Assemble and process in background
+      assembleAndProcess(id, job);
+    }
+
+    return c.json({ received: job.receivedChunks, total: job.totalChunks });
+
+  } catch (err) {
+    console.error(`[${id}] Chunk ${index} error:`, err);
+    return c.json({ error: "Failed to save chunk" }, 500);
+  }
+});
+
+async function assembleAndProcess(id: string, job: Job) {
+  try {
+    // Assemble chunks into a single buffer
+    const chunkFiles: string[] = [];
+    for (let i = 0; i < job.totalChunks; i++) {
+      chunkFiles.push(join(job.uploadDir!, `chunk-${String(i).padStart(6, "0")}`));
+    }
+
+    job.message = "Assembling file...";
+    job.percent = 42;
+
+    const chunks: Buffer[] = [];
+    for (const chunkPath of chunkFiles) {
+      chunks.push(Buffer.from(await readFile(chunkPath)));
+    }
+    const inputBuffer = Buffer.concat(chunks);
+
+    // Clean up chunk files
+    rm(job.uploadDir!, { recursive: true, force: true }).catch(() => {});
+    job.uploadDir = undefined;
+
+    // Validate ZIP magic bytes
+    if (inputBuffer[0] !== 0x50 || inputBuffer[1] !== 0x4b) {
+      job.status = "error";
+      job.error = "File is not a valid PPTX archive";
+      job.message = job.error;
+      return;
+    }
+
+    console.log(`[${id}] Processing started, font: ${job.targetFont}`);
+
+    job.message = "Unpacking PPTX archive...";
+    job.percent = 45;
+
+    const { output, stats } = await normalizePptxBuffer(inputBuffer, { targetFont: job.targetFont }, (stage, current, total) => {
+      // Processing = 45-90%
+      const stageMap: Record<string, { msg: string; base: number; weight: number }> = {
+        unzip:   { msg: "Unpacking PPTX archive...", base: 45, weight: 5 },
+        themes:  { msg: `Fixing themes (${current + 1}/${total})...`, base: 50, weight: 3 },
+        slides:  { msg: `Fixing slides (${current + 1}/${total})...`, base: 53, weight: 25 },
+        layouts: { msg: `Fixing layouts (${current + 1}/${total})...`, base: 78, weight: 4 },
+        masters: { msg: `Fixing masters (${current + 1}/${total})...`, base: 82, weight: 3 },
+        zip:     { msg: "Compressing fixed file...", base: 85, weight: 10 },
+      };
+      const s = stageMap[stage];
+      if (s) {
+        const stagePercent = total > 0 ? current / total : 0;
+        job.stage = stage;
+        job.message = s.msg;
+        job.percent = Math.round(s.base + s.weight * stagePercent);
+      }
+    });
+
+    job.message = "Saving result...";
+    job.percent = 95;
+
+    const baseName = job.originalName.replace(/\.pptx$/i, "");
+    const outputName = `${baseName}-fixed.pptx`;
+    const tempPath = join(TEMP_DIR, `${id}.pptx`);
+    await Bun.write(tempPath, output);
+
+    job.status = "done";
+    job.percent = 100;
+    job.message = "Done!";
+    job.fileName = outputName;
+    job.filePath = tempPath;
+    job.stats = stats;
+
+    console.log(
+      `[${id}] Processing finished: ${stats.themes} theme(s), ${stats.masters} master(s), ${stats.layouts} layout(s), ${stats.slides} slide(s)`
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error(`[${id}] Error:`, message);
+    job.status = "error";
+    job.message = "Processing failed. The file may be corrupted or not a valid PPTX.";
+    job.error = job.message;
+  }
+}
 
 // Poll job status
 app.get("/api/status/:id", (c) => {
