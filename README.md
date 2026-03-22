@@ -190,23 +190,3 @@ Issues and PRs welcome at [github.com/yatskovskyi/PowerPain](https://github.com/
 `USDT (TRC-20): TBxEquczDy6ZSRPAyYrNbczoaP9YThaJuZ`
 
 </div>
-
----
-
-## Social Post
-
-> **Font won't change in PowerPoint? Yeah, I've been there.**
->
-> I'm writing academic papers right now, and part of the process is redrawing figures in PowerPoint to later insert them into Word. Don't ask why — that's just how it works.
->
-> The problem: when you import shapes into .pptx, the text inside them **refuses to change font**. You select everything, pick Arial — nothing happens. Multiply that by dozens of figures and you've got a real problem.
->
-> I always solve these things with code, so I dug into the .pptx XML structure and found the root causes — CJK language attributes (`zh-CN`), theme font references (`+mj-lt`), broken inheritance from layouts and masters. Built a tool that fixes all of this automatically.
->
-> **PowerPain** — upload your broken .pptx, get a fixed one back. One click. Free. Open-source.
->
-> Try it: https://powerpain.yatskovskyi.top
-> Source: https://github.com/yatskovskyi/PowerPain
->
-> Built with Bun + Hono + TypeScript. MIT license.
-> If it saved your time — there's a donate button on the site.
