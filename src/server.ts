@@ -263,9 +263,17 @@ app.use("/*", async (c, next) => {
 
 app.use("/*", serveStatic({ root: "./src/public" }));
 
-// ─── Catch-all: block unmatched routes ───────────────────────────────────────
+// ─── 404 page ────────────────────────────────────────────────────────────────
 
-app.all("*", (c) => c.text("Not Found", 404));
+let notFoundHtml: string | null = null;
+
+app.all("*", async (c) => {
+  if (!notFoundHtml) {
+    const file = Bun.file(join(import.meta.dir, "public", "404.html"));
+    notFoundHtml = await file.text();
+  }
+  return c.html(notFoundHtml, 404);
+});
 
 // ─── Start ──────────────────────────────────────────────────────────────────
 
