@@ -125,12 +125,19 @@ function removeChildrenByLocalName(el: Element, names: string[]): void {
 
 // ─── Main: process PPTX buffer → buffer ─────────────────────────────────────
 
+export type ProgressCallback = (stage: string, current: number, total: number) => void;
+
 export async function normalizePptxBuffer(
   input: Buffer | Uint8Array,
-  opts: Partial<NormalizeOptions> = {}
+  opts: Partial<NormalizeOptions> = {},
+  onProgress?: ProgressCallback
 ): Promise<{ output: Buffer; stats: NormalizeStats }> {
   const options: NormalizeOptions = { ...DEFAULT_OPTIONS, ...opts };
+  const progress = onProgress || (() => {});
+
+  progress("unzip", 0, 1);
   const zip = await JSZip.loadAsync(input);
+  progress("unzip", 1, 1);
 
   const stats: NormalizeStats = { slides: 0, layouts: 0, masters: 0, themes: 0 };
 
@@ -139,10 +146,12 @@ export async function normalizePptxBuffer(
       /^ppt\/theme\/theme\d+\.xml$/.test(f)
     );
     for (const themePath of themeFiles) {
+      progress("themes", stats.themes, themeFiles.length);
       const xml = await zip.file(themePath)!.async("string");
       zip.file(themePath, normalizeThemeFonts(xml, options.targetFont));
       stats.themes++;
     }
+    if (themeFiles.length > 0) progress("themes", stats.themes, themeFiles.length);
   }
 
   if (options.fixSlides) {
@@ -150,10 +159,12 @@ export async function normalizePptxBuffer(
       /^ppt\/slides\/slide\d+\.xml$/.test(f)
     );
     for (const slidePath of slideFiles) {
+      progress("slides", stats.slides, slideFiles.length);
       const xml = await zip.file(slidePath)!.async("string");
       zip.file(slidePath, normalizeXmlFonts(xml, options));
       stats.slides++;
     }
+    if (slideFiles.length > 0) progress("slides", stats.slides, slideFiles.length);
   }
 
   if (options.fixLayouts) {
@@ -161,10 +172,12 @@ export async function normalizePptxBuffer(
       /^ppt\/slideLayouts\/slideLayout\d+\.xml$/.test(f)
     );
     for (const layoutPath of layoutFiles) {
+      progress("layouts", stats.layouts, layoutFiles.length);
       const xml = await zip.file(layoutPath)!.async("string");
       zip.file(layoutPath, normalizeXmlFonts(xml, options));
       stats.layouts++;
     }
+    if (layoutFiles.length > 0) progress("layouts", stats.layouts, layoutFiles.length);
   }
 
   if (options.fixMaster) {
@@ -172,17 +185,21 @@ export async function normalizePptxBuffer(
       /^ppt\/slideMasters\/slideMaster\d+\.xml$/.test(f)
     );
     for (const masterPath of masterFiles) {
+      progress("masters", stats.masters, masterFiles.length);
       const xml = await zip.file(masterPath)!.async("string");
       zip.file(masterPath, normalizeXmlFonts(xml, options));
       stats.masters++;
     }
+    if (masterFiles.length > 0) progress("masters", stats.masters, masterFiles.length);
   }
 
+  progress("zip", 0, 1);
   const output = await zip.generateAsync({
     type: "nodebuffer",
     compression: "DEFLATE",
     compressionOptions: { level: 6 },
   });
+  progress("zip", 1, 1);
 
   return { output: Buffer.from(output), stats };
 }

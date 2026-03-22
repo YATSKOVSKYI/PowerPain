@@ -706,12 +706,31 @@ a:hover { color: var(--primary-hover); }
   border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
+  flex-wrap: wrap;
+  position: relative;
 }
 
 .status-bar.uploading,
 .status-bar.processing { background: var(--warning-bg); color: var(--warning); }
 .status-bar.done { background: var(--success-bg); color: var(--success); }
 .status-bar.error { background: var(--error-bg); color: var(--error); }
+
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--warning);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(255, 159, 10, 0.4);
+}
 
 .spinner {
   width: 16px;

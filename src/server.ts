@@ -124,9 +124,21 @@ app.use("*", async (c, next) => {
 
 // ─── API ────────────────────────────────────────────────────────────────────
 
+// Store completed results for download (auto-expire after 10 min)
+const resultStore = new Map<string, { path: string; name: string; stats: import("./pptx-normalizer").NormalizeStats; createdAt: number }>();
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, entry] of resultStore) {
+    if (now - entry.createdAt > 10 * 60 * 1000) {
+      removeTempFile(entry.path);
+      resultStore.delete(id);
+    }
+  }
+}, 60 * 1000).unref();
+
 app.post("/api/process", async (c) => {
   const requestId = crypto.randomUUID().slice(0, 8);
-  let tempInputPath: string | null = null;
 
   try {
     // Rate limiting
@@ -153,17 +165,14 @@ app.post("/api/process", async (c) => {
       return c.json({ error: "No file uploaded" }, 400);
     }
 
-    // Validate font
     if (!ALLOWED_FONTS.includes(targetFont)) {
       return c.json({ error: `Font not allowed. Choose from: ${ALLOWED_FONTS.join(", ")}` }, 400);
     }
 
-    // Validate extension
     if (!file.name.toLowerCase().endsWith(".pptx")) {
       return c.json({ error: "Only .pptx files are accepted" }, 400);
     }
 
-    // Validate MIME type
     const validMimes = [
       "application/vnd.openxmlformats-officedocument.presentationml.presentation",
       "application/octet-stream",
@@ -173,53 +182,121 @@ app.post("/api/process", async (c) => {
       return c.json({ error: "Invalid file type" }, 400);
     }
 
-    // Validate size
     if (file.size > MAX_FILE_SIZE) {
       return c.json({ error: `File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024} MB` }, 400);
     }
 
     console.log(`[${requestId}] Upload started: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`);
 
-    // Read file into buffer (no temp file needed for input — process in memory)
     const arrayBuffer = await file.arrayBuffer();
     const inputBuffer = Buffer.from(arrayBuffer);
 
-    // Validate it's actually a ZIP (PPTX is a ZIP archive)
     if (inputBuffer[0] !== 0x50 || inputBuffer[1] !== 0x4b) {
       return c.json({ error: "File is not a valid PPTX archive" }, 400);
     }
 
-    console.log(`[${requestId}] Processing started, font: ${targetFont}`);
-
-    const { output, stats } = await normalizePptxBuffer(inputBuffer, { targetFont });
-
-    console.log(
-      `[${requestId}] Processing finished: ${stats.themes} theme(s), ${stats.masters} master(s), ${stats.layouts} layout(s), ${stats.slides} slide(s)`
-    );
-
-    // Build output filename
     const baseName = file.name.replace(/\.pptx$/i, "");
     const outputName = `${baseName}-fixed.pptx`;
 
-    return new Response(output, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-        "Content-Disposition": `attachment; filename="${encodeURIComponent(outputName)}"`,
-        "Content-Length": output.length.toString(),
-        "X-Stats": JSON.stringify(stats),
+    console.log(`[${requestId}] Processing started, font: ${targetFont}`);
+
+    // SSE stream for live progress
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        const send = (event: string, data: object) => {
+          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+        };
+
+        try {
+          send("progress", { stage: "upload", message: "File received, unpacking archive...", percent: 5 });
+
+          const { output, stats } = await normalizePptxBuffer(inputBuffer, { targetFont }, (stage, current, total) => {
+            const stageMap: Record<string, { msg: string; base: number; weight: number }> = {
+              unzip:   { msg: "Unpacking PPTX archive...", base: 5, weight: 10 },
+              themes:  { msg: `Fixing themes (${current + 1}/${total})...`, base: 15, weight: 5 },
+              slides:  { msg: `Fixing slides (${current + 1}/${total})...`, base: 20, weight: 40 },
+              layouts: { msg: `Fixing layouts (${current + 1}/${total})...`, base: 60, weight: 10 },
+              masters: { msg: `Fixing masters (${current + 1}/${total})...`, base: 70, weight: 5 },
+              zip:     { msg: "Compressing fixed file...", base: 75, weight: 20 },
+            };
+
+            const s = stageMap[stage];
+            if (s) {
+              const stagePercent = total > 0 ? current / total : 0;
+              const percent = Math.round(s.base + s.weight * stagePercent);
+              send("progress", { stage, message: s.msg, percent });
+            }
+          });
+
+          send("progress", { stage: "saving", message: "Saving result...", percent: 95 });
+
+          // Save result to temp file for download
+          const tempPath = join(TEMP_DIR, `${requestId}.pptx`);
+          await Bun.write(tempPath, output);
+          resultStore.set(requestId, { path: tempPath, name: outputName, stats, createdAt: Date.now() });
+
+          console.log(
+            `[${requestId}] Processing finished: ${stats.themes} theme(s), ${stats.masters} master(s), ${stats.layouts} layout(s), ${stats.slides} slide(s)`
+          );
+
+          send("done", { downloadId: requestId, fileName: outputName, stats });
+
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Unknown error";
+          console.error(`[${requestId}] Error:`, message);
+          send("error", { error: "Processing failed. The file may be corrupted or not a valid PPTX." });
+        }
+
+        controller.close();
       },
     });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "X-Accel-Buffering": "no",
+      },
+    });
+
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error(`[${requestId}] Error:`, message);
     return c.json({ error: "Processing failed. The file may be corrupted or not a valid PPTX." }, 500);
-  } finally {
-    if (tempInputPath) {
-      await removeTempFile(tempInputPath);
-      console.log(`[${requestId}] Cleanup done`);
-    }
   }
+});
+
+// Download endpoint for completed results
+app.get("/api/download/:id", async (c) => {
+  const id = c.req.param("id");
+  const entry = resultStore.get(id);
+
+  if (!entry) {
+    return c.json({ error: "File not found or expired. Please process again." }, 404);
+  }
+
+  const file = Bun.file(entry.path);
+  if (!(await file.exists())) {
+    resultStore.delete(id);
+    return c.json({ error: "File not found. Please process again." }, 404);
+  }
+
+  const buffer = await file.arrayBuffer();
+
+  // Clean up after download
+  removeTempFile(entry.path);
+  resultStore.delete(id);
+
+  return new Response(buffer, {
+    headers: {
+      "Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "Content-Disposition": `attachment; filename="${encodeURIComponent(entry.name)}"`,
+      "Content-Length": buffer.byteLength.toString(),
+      "X-Stats": JSON.stringify(entry.stats),
+    },
+  });
 });
 
 app.get("/api/fonts", (c) => {

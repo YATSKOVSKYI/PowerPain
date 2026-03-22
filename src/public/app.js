@@ -424,15 +424,13 @@
     btnProcess.disabled = true;
     downloadArea.classList.remove("visible");
 
-    showStatus("uploading", t.statusUploading);
+    showStatus("uploading", t.statusUploading, 0);
 
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("targetFont", fontSelect.value);
 
     try {
-      showStatus("processing", t.statusProcessing);
-
       const response = await fetch("/api/process", {
         method: "POST",
         body: formData,
@@ -443,23 +441,61 @@
         throw new Error(err.error || `Server error (${response.status})`);
       }
 
-      resultBlob = await response.blob();
+      // Read SSE stream for progress
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let downloadId = null;
+      let doneStats = null;
 
-      const disposition = response.headers.get("Content-Disposition") || "";
-      const match = disposition.match(/filename="?([^";\n]+)"?/);
-      resultName = match ? decodeURIComponent(match[1]) : selectedFile.name.replace(/\.pptx$/i, "-fixed.pptx");
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-      const statsHeader = response.headers.get("X-Stats");
-      if (statsHeader) {
-        try {
-          const s = JSON.parse(statsHeader);
-          statsText.textContent = `Fixed: ${s.themes} theme(s), ${s.masters} master(s), ${s.layouts} layout(s), ${s.slides} slide(s)`;
-        } catch {
-          statsText.textContent = "";
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        let eventType = "";
+        for (const line of lines) {
+          if (line.startsWith("event: ")) {
+            eventType = line.slice(7).trim();
+          } else if (line.startsWith("data: ")) {
+            const data = JSON.parse(line.slice(6));
+
+            if (eventType === "progress") {
+              showStatus("processing", data.message, data.percent);
+            } else if (eventType === "done") {
+              downloadId = data.downloadId;
+              resultName = data.fileName;
+              doneStats = data.stats;
+            } else if (eventType === "error") {
+              throw new Error(data.error);
+            }
+          }
         }
       }
 
-      showStatus("done", t.statusDone);
+      if (!downloadId) {
+        throw new Error(t.statusError);
+      }
+
+      showStatus("processing", t.statusDone.split("!")[0] + "! Downloading...", 98);
+
+      // Download the result
+      const dlResponse = await fetch("/api/download/" + downloadId);
+      if (!dlResponse.ok) {
+        const err = await dlResponse.json().catch(() => ({ error: "Download failed" }));
+        throw new Error(err.error || "Download failed");
+      }
+
+      resultBlob = await dlResponse.blob();
+
+      if (doneStats) {
+        statsText.textContent = `Fixed: ${doneStats.themes} theme(s), ${doneStats.masters} master(s), ${doneStats.layouts} layout(s), ${doneStats.slides} slide(s)`;
+      }
+
+      showStatus("done", t.statusDone, 100);
       downloadArea.classList.add("visible");
     } catch (err) {
       showStatus("error", err.message || t.statusError);
@@ -499,7 +535,7 @@
 
   // ─── Helpers ────────────────────────────────────────────────
 
-  function showStatus(type, text) {
+  function showStatus(type, text, percent) {
     status.classList.add("visible");
     statusBar.className = "status-bar " + type;
 
@@ -511,7 +547,25 @@
       statusIcon.textContent = "✕";
     }
 
-    statusText.textContent = text;
+    // Show progress percentage for active states
+    let progressBar = statusBar.querySelector(".progress-fill");
+    if (type === "uploading" || type === "processing") {
+      if (!progressBar) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "progress-track";
+        progressBar = document.createElement("div");
+        progressBar.className = "progress-fill";
+        wrapper.appendChild(progressBar);
+        statusBar.appendChild(wrapper);
+      }
+      const pct = typeof percent === "number" ? Math.min(percent, 100) : 0;
+      progressBar.style.width = pct + "%";
+      statusText.textContent = text + (pct > 0 ? " (" + pct + "%)" : "");
+    } else {
+      const track = statusBar.querySelector(".progress-track");
+      if (track) track.remove();
+      statusText.textContent = text;
+    }
   }
 
   function hideStatus() {
