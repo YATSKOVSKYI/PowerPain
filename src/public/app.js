@@ -424,33 +424,53 @@
     btnProcess.disabled = true;
     downloadArea.classList.remove("visible");
 
-    showStatus("uploading", t.statusUploading, 0);
-
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("targetFont", fontSelect.value);
-
     try {
-      // Step 1: Upload file and get jobId
-      const response = await fetch("/api/process", {
+      // Step 1: Init chunked upload
+      showStatus("uploading", t.statusUploading + " (0%)", 0);
+
+      const initRes = await fetch("/api/upload/init", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: selectedFile.name,
+          fileSize: selectedFile.size,
+          targetFont: fontSelect.value,
+        }),
       });
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({ error: "Server error" }));
-        throw new Error(err.error || `Server error (${response.status})`);
+      if (!initRes.ok) {
+        const err = await initRes.json().catch(() => ({ error: "Server error" }));
+        throw new Error(err.error || "Failed to initialize upload");
       }
 
-      const { jobId } = await response.json();
-      if (!jobId) throw new Error("No job ID received");
+      const { jobId, chunkSize, totalChunks } = await initRes.json();
 
-      showStatus("processing", t.statusProcessing, 5);
+      // Step 2: Upload chunks sequentially
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * chunkSize;
+        const end = Math.min(start + chunkSize, selectedFile.size);
+        const chunk = selectedFile.slice(start, end);
 
-      // Step 2: Poll for progress
+        const uploadPercent = Math.round(((i + 1) / totalChunks) * 40);
+        showStatus("uploading", t.statusUploading + ` (${i + 1}/${totalChunks})`, uploadPercent);
+
+        const chunkRes = await fetch(`/api/upload/${jobId}/chunk/${i}`, {
+          method: "POST",
+          body: chunk,
+        });
+
+        if (!chunkRes.ok) {
+          const err = await chunkRes.json().catch(() => ({ error: "Chunk upload failed" }));
+          throw new Error(err.error || `Failed to upload chunk ${i + 1}`);
+        }
+      }
+
+      // Step 3: Poll for processing progress
+      showStatus("processing", t.statusProcessing, 42);
+
       const jobResult = await pollJobStatus(jobId, t);
 
-      // Step 3: Download the result
+      // Step 4: Download the result
       showStatus("processing", t.statusDone.split("!")[0] + "!", 98);
 
       const dlResponse = await fetch("/api/download/" + jobId);
@@ -491,7 +511,7 @@
 
           const data = await res.json();
 
-          if (data.status === "processing") {
+          if (data.status === "uploading" || data.status === "processing") {
             showStatus("processing", data.message, data.percent);
 
             if (attempts >= maxAttempts) {
