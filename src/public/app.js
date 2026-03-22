@@ -431,6 +431,7 @@
     formData.append("targetFont", fontSelect.value);
 
     try {
+      // Step 1: Upload file and get jobId
       const response = await fetch("/api/process", {
         method: "POST",
         body: formData,
@@ -441,58 +442,29 @@
         throw new Error(err.error || `Server error (${response.status})`);
       }
 
-      // Read SSE stream for progress
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let downloadId = null;
-      let doneStats = null;
+      const { jobId } = await response.json();
+      if (!jobId) throw new Error("No job ID received");
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      showStatus("processing", t.statusProcessing, 5);
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
+      // Step 2: Poll for progress
+      const jobResult = await pollJobStatus(jobId, t);
 
-        let eventType = "";
-        for (const line of lines) {
-          if (line.startsWith("event: ")) {
-            eventType = line.slice(7).trim();
-          } else if (line.startsWith("data: ")) {
-            const data = JSON.parse(line.slice(6));
+      // Step 3: Download the result
+      showStatus("processing", t.statusDone.split("!")[0] + "!", 98);
 
-            if (eventType === "progress") {
-              showStatus("processing", data.message, data.percent);
-            } else if (eventType === "done") {
-              downloadId = data.downloadId;
-              resultName = data.fileName;
-              doneStats = data.stats;
-            } else if (eventType === "error") {
-              throw new Error(data.error);
-            }
-          }
-        }
-      }
-
-      if (!downloadId) {
-        throw new Error(t.statusError);
-      }
-
-      showStatus("processing", t.statusDone.split("!")[0] + "! Downloading...", 98);
-
-      // Download the result
-      const dlResponse = await fetch("/api/download/" + downloadId);
+      const dlResponse = await fetch("/api/download/" + jobId);
       if (!dlResponse.ok) {
         const err = await dlResponse.json().catch(() => ({ error: "Download failed" }));
         throw new Error(err.error || "Download failed");
       }
 
       resultBlob = await dlResponse.blob();
+      resultName = jobResult.fileName || selectedFile.name.replace(/\.pptx$/i, "-fixed.pptx");
 
-      if (doneStats) {
-        statsText.textContent = `Fixed: ${doneStats.themes} theme(s), ${doneStats.masters} master(s), ${doneStats.layouts} layout(s), ${doneStats.slides} slide(s)`;
+      if (jobResult.stats) {
+        const s = jobResult.stats;
+        statsText.textContent = `Fixed: ${s.themes} theme(s), ${s.masters} master(s), ${s.layouts} layout(s), ${s.slides} slide(s)`;
       }
 
       showStatus("done", t.statusDone, 100);
@@ -502,6 +474,44 @@
       btnProcess.disabled = false;
     }
   });
+
+  function pollJobStatus(jobId, t) {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      const maxAttempts = 600; // 5 minutes max (600 * 500ms)
+
+      const poll = async () => {
+        attempts++;
+        try {
+          const res = await fetch("/api/status/" + jobId);
+          if (!res.ok) {
+            reject(new Error(t.statusError));
+            return;
+          }
+
+          const data = await res.json();
+
+          if (data.status === "processing") {
+            showStatus("processing", data.message, data.percent);
+
+            if (attempts >= maxAttempts) {
+              reject(new Error("Processing timed out. Please try a smaller file."));
+              return;
+            }
+            setTimeout(poll, 500);
+          } else if (data.status === "done") {
+            resolve(data);
+          } else if (data.status === "error") {
+            reject(new Error(data.error || t.statusError));
+          }
+        } catch (err) {
+          reject(new Error(t.statusError));
+        }
+      };
+
+      poll();
+    });
+  }
 
   // ─── Download ───────────────────────────────────────────────
 

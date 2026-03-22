@@ -124,15 +124,29 @@ app.use("*", async (c, next) => {
 
 // ─── API ────────────────────────────────────────────────────────────────────
 
-// Store completed results for download (auto-expire after 10 min)
-const resultStore = new Map<string, { path: string; name: string; stats: import("./pptx-normalizer").NormalizeStats; createdAt: number }>();
+// ─── Job store for async processing with polling ────────────────────────────
 
+interface Job {
+  status: "processing" | "done" | "error";
+  stage: string;
+  message: string;
+  percent: number;
+  fileName?: string;
+  filePath?: string;
+  stats?: import("./pptx-normalizer").NormalizeStats;
+  error?: string;
+  createdAt: number;
+}
+
+const jobStore = new Map<string, Job>();
+
+// Clean up old jobs every minute
 setInterval(() => {
   const now = Date.now();
-  for (const [id, entry] of resultStore) {
-    if (now - entry.createdAt > 10 * 60 * 1000) {
-      removeTempFile(entry.path);
-      resultStore.delete(id);
+  for (const [id, job] of jobStore) {
+    if (now - job.createdAt > 15 * 60 * 1000) {
+      if (job.filePath) removeTempFile(job.filePath);
+      jobStore.delete(id);
     }
   }
 }, 60 * 1000).unref();
@@ -198,68 +212,68 @@ app.post("/api/process", async (c) => {
     const baseName = file.name.replace(/\.pptx$/i, "");
     const outputName = `${baseName}-fixed.pptx`;
 
+    // Create job and start processing in background
+    const job: Job = {
+      status: "processing",
+      stage: "upload",
+      message: "File received, unpacking archive...",
+      percent: 5,
+      createdAt: Date.now(),
+    };
+    jobStore.set(requestId, job);
+
     console.log(`[${requestId}] Processing started, font: ${targetFont}`);
 
-    // SSE stream for live progress
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-        const send = (event: string, data: object) => {
-          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
-        };
+    // Return immediately with jobId — processing runs async
+    const processAsync = async () => {
+      try {
+        const { output, stats } = await normalizePptxBuffer(inputBuffer, { targetFont }, (stage, current, total) => {
+          const stageMap: Record<string, { msg: string; base: number; weight: number }> = {
+            unzip:   { msg: "Unpacking PPTX archive...", base: 5, weight: 10 },
+            themes:  { msg: `Fixing themes (${current + 1}/${total})...`, base: 15, weight: 5 },
+            slides:  { msg: `Fixing slides (${current + 1}/${total})...`, base: 20, weight: 40 },
+            layouts: { msg: `Fixing layouts (${current + 1}/${total})...`, base: 60, weight: 10 },
+            masters: { msg: `Fixing masters (${current + 1}/${total})...`, base: 70, weight: 5 },
+            zip:     { msg: "Compressing fixed file...", base: 75, weight: 20 },
+          };
+          const s = stageMap[stage];
+          if (s) {
+            const stagePercent = total > 0 ? current / total : 0;
+            job.stage = stage;
+            job.message = s.msg;
+            job.percent = Math.round(s.base + s.weight * stagePercent);
+          }
+        });
 
-        try {
-          send("progress", { stage: "upload", message: "File received, unpacking archive...", percent: 5 });
+        job.message = "Saving result...";
+        job.percent = 95;
 
-          const { output, stats } = await normalizePptxBuffer(inputBuffer, { targetFont }, (stage, current, total) => {
-            const stageMap: Record<string, { msg: string; base: number; weight: number }> = {
-              unzip:   { msg: "Unpacking PPTX archive...", base: 5, weight: 10 },
-              themes:  { msg: `Fixing themes (${current + 1}/${total})...`, base: 15, weight: 5 },
-              slides:  { msg: `Fixing slides (${current + 1}/${total})...`, base: 20, weight: 40 },
-              layouts: { msg: `Fixing layouts (${current + 1}/${total})...`, base: 60, weight: 10 },
-              masters: { msg: `Fixing masters (${current + 1}/${total})...`, base: 70, weight: 5 },
-              zip:     { msg: "Compressing fixed file...", base: 75, weight: 20 },
-            };
+        const tempPath = join(TEMP_DIR, `${requestId}.pptx`);
+        await Bun.write(tempPath, output);
 
-            const s = stageMap[stage];
-            if (s) {
-              const stagePercent = total > 0 ? current / total : 0;
-              const percent = Math.round(s.base + s.weight * stagePercent);
-              send("progress", { stage, message: s.msg, percent });
-            }
-          });
+        job.status = "done";
+        job.percent = 100;
+        job.message = "Done!";
+        job.fileName = outputName;
+        job.filePath = tempPath;
+        job.stats = stats;
 
-          send("progress", { stage: "saving", message: "Saving result...", percent: 95 });
+        console.log(
+          `[${requestId}] Processing finished: ${stats.themes} theme(s), ${stats.masters} master(s), ${stats.layouts} layout(s), ${stats.slides} slide(s)`
+        );
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        console.error(`[${requestId}] Error:`, message);
+        job.status = "error";
+        job.message = "Processing failed. The file may be corrupted or not a valid PPTX.";
+        job.error = job.message;
+      }
+    };
 
-          // Save result to temp file for download
-          const tempPath = join(TEMP_DIR, `${requestId}.pptx`);
-          await Bun.write(tempPath, output);
-          resultStore.set(requestId, { path: tempPath, name: outputName, stats, createdAt: Date.now() });
+    // Fire-and-forget — don't await
+    processAsync();
 
-          console.log(
-            `[${requestId}] Processing finished: ${stats.themes} theme(s), ${stats.masters} master(s), ${stats.layouts} layout(s), ${stats.slides} slide(s)`
-          );
-
-          send("done", { downloadId: requestId, fileName: outputName, stats });
-
-        } catch (err) {
-          const message = err instanceof Error ? err.message : "Unknown error";
-          console.error(`[${requestId}] Error:`, message);
-          send("error", { error: "Processing failed. The file may be corrupted or not a valid PPTX." });
-        }
-
-        controller.close();
-      },
-    });
-
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-        "X-Accel-Buffering": "no",
-      },
-    });
+    return c.json({ jobId: requestId });
 
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -268,33 +282,52 @@ app.post("/api/process", async (c) => {
   }
 });
 
-// Download endpoint for completed results
+// Poll job status
+app.get("/api/status/:id", (c) => {
+  const id = c.req.param("id");
+  const job = jobStore.get(id);
+
+  if (!job) {
+    return c.json({ error: "Job not found or expired." }, 404);
+  }
+
+  return c.json({
+    status: job.status,
+    stage: job.stage,
+    message: job.message,
+    percent: job.percent,
+    ...(job.status === "done" && { fileName: job.fileName, stats: job.stats }),
+    ...(job.status === "error" && { error: job.error }),
+  });
+});
+
+// Download completed result
 app.get("/api/download/:id", async (c) => {
   const id = c.req.param("id");
-  const entry = resultStore.get(id);
+  const job = jobStore.get(id);
 
-  if (!entry) {
+  if (!job || job.status !== "done" || !job.filePath) {
     return c.json({ error: "File not found or expired. Please process again." }, 404);
   }
 
-  const file = Bun.file(entry.path);
+  const file = Bun.file(job.filePath);
   if (!(await file.exists())) {
-    resultStore.delete(id);
+    jobStore.delete(id);
     return c.json({ error: "File not found. Please process again." }, 404);
   }
 
   const buffer = await file.arrayBuffer();
 
   // Clean up after download
-  removeTempFile(entry.path);
-  resultStore.delete(id);
+  removeTempFile(job.filePath);
+  jobStore.delete(id);
 
   return new Response(buffer, {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "Content-Disposition": `attachment; filename="${encodeURIComponent(entry.name)}"`,
+      "Content-Disposition": `attachment; filename="${encodeURIComponent(job.fileName!)}"`,
       "Content-Length": buffer.byteLength.toString(),
-      "X-Stats": JSON.stringify(entry.stats),
+      "X-Stats": JSON.stringify(job.stats),
     },
   });
 });
