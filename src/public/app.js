@@ -3,6 +3,7 @@
 
   const MAX_SIZE = 200 * 1024 * 1024;
   const WALLET = "TBxEquczDy6ZSRPAyYrNbczoaP9YThaJuZ";
+  const NS_A = "http://schemas.openxmlformats.org/drawingml/2006/main";
 
   // ─── i18n ───────────────────────────────────────────────────
 
@@ -21,8 +22,13 @@
       btnProcess: "Fix Fonts",
       btnDownload: "Download Fixed File",
       btnReset: "Process another file",
-      statusUploading: "Uploading file...",
-      statusProcessing: "Processing — fixing fonts...",
+      statusReading: "Reading file...",
+      statusUnpacking: "Unpacking PPTX archive...",
+      statusThemes: "Fixing themes",
+      statusSlides: "Fixing slides",
+      statusLayouts: "Fixing layouts",
+      statusMasters: "Fixing masters",
+      statusCompressing: "Compressing fixed file...",
       statusDone: "Done! Your file is ready.",
       statusError: "Processing failed",
       featuresLabel: "How it works",
@@ -33,7 +39,7 @@
       step2Text: "We normalize fonts in slides, layouts, masters, and themes. Fix CJK issues and theme references.",
       step3Title: "Download",
       step3Text: "Get your fixed file instantly. All temporary data is deleted right after processing.",
-      privacy: "Your files are processed on the server and deleted immediately after. Nothing is stored, logged, or shared.",
+      privacy: "Your files never leave your device. All processing happens right in your browser — nothing is uploaded to any server.",
       donateHeadline1: "This takes hours.",
       donateHeadline2: "Your donation is ",
       donateFuel: "fuel",
@@ -61,8 +67,13 @@
       btnProcess: "Исправить шрифты",
       btnDownload: "Скачать исправленный файл",
       btnReset: "Обработать другой файл",
-      statusUploading: "Загрузка файла...",
-      statusProcessing: "Обработка — исправление шрифтов...",
+      statusReading: "Чтение файла...",
+      statusUnpacking: "Распаковка PPTX-архива...",
+      statusThemes: "Исправление тем",
+      statusSlides: "Исправление слайдов",
+      statusLayouts: "Исправление макетов",
+      statusMasters: "Исправление мастеров",
+      statusCompressing: "Сжатие исправленного файла...",
       statusDone: "Готово! Ваш файл готов.",
       statusError: "Ошибка обработки",
       featuresLabel: "Как это работает",
@@ -73,7 +84,7 @@
       step2Text: "Мы нормализуем шрифты в слайдах, макетах, мастерах и темах. Исправляем CJK и ссылки тем.",
       step3Title: "Скачайте",
       step3Text: "Получите исправленный файл мгновенно. Все временные данные удаляются сразу после обработки.",
-      privacy: "Ваши файлы обрабатываются на сервере и удаляются сразу после. Ничего не сохраняется, не логируется и не передаётся.",
+      privacy: "Ваши файлы не покидают ваше устройство. Вся обработка происходит прямо в браузере — ничего не загружается на сервер.",
       donateHeadline1: "На это уходят часы.",
       donateHeadline2: "Ваш донат — ",
       donateFuel: "топливо",
@@ -101,8 +112,13 @@
       btnProcess: "Виправити шрифти",
       btnDownload: "Завантажити виправлений файл",
       btnReset: "Обробити інший файл",
-      statusUploading: "Завантаження файлу...",
-      statusProcessing: "Обробка — виправлення шрифтів...",
+      statusReading: "Читання файлу...",
+      statusUnpacking: "Розпакування PPTX-архіву...",
+      statusThemes: "Виправлення тем",
+      statusSlides: "Виправлення слайдів",
+      statusLayouts: "Виправлення макетів",
+      statusMasters: "Виправлення мастерів",
+      statusCompressing: "Стиснення виправленого файлу...",
       statusDone: "Готово! Ваш файл готовий.",
       statusError: "Помилка обробки",
       featuresLabel: "Як це працює",
@@ -113,7 +129,7 @@
       step2Text: "Ми нормалізуємо шрифти в слайдах, макетах, мастерах та темах. Виправляємо CJK та посилання тем.",
       step3Title: "Завантажте",
       step3Text: "Отримайте виправлений файл миттєво. Усі тимчасові дані видаляються одразу після обробки.",
-      privacy: "Ваші файли обробляються на сервері та видаляються одразу після. Нічого не зберігається, не логується та не передається.",
+      privacy: "Ваші файли не покидають ваш пристрій. Уся обробка відбувається прямо у браузері — нічого не завантажується на сервер.",
       donateHeadline1: "На це йдуть години.",
       donateHeadline2: "Ваш донат — ",
       donateFuel: "паливо",
@@ -141,8 +157,13 @@
       btnProcess: "修复字体",
       btnDownload: "下载修复后的文件",
       btnReset: "处理另一个文件",
-      statusUploading: "正在上传文件...",
-      statusProcessing: "处理中 — 修复字体...",
+      statusReading: "正在读取文件...",
+      statusUnpacking: "正在解压 PPTX 存档...",
+      statusThemes: "修复主题",
+      statusSlides: "修复幻灯片",
+      statusLayouts: "修复布局",
+      statusMasters: "修复母版",
+      statusCompressing: "正在压缩修复后的文件...",
       statusDone: "完成！您的文件已准备好。",
       statusError: "处理失败",
       featuresLabel: "工作原理",
@@ -153,7 +174,7 @@
       step2Text: "我们在幻灯片、布局、母版和主题中规范化字体。修复 CJK 问题和主题引用。",
       step3Title: "下载",
       step3Text: "立即获取修复后的文件。所有临时数据在处理后立即删除。",
-      privacy: "您的文件在服务器上处理并立即删除。不会存储、记录或共享任何内容。",
+      privacy: "您的文件不会离开您的设备。所有处理都在浏览器中完成 — 没有任何内容上传到服务器。",
       donateHeadline1: "这需要数小时。",
       donateHeadline2: "您的捐赠是",
       donateFuel: "动力",
@@ -181,8 +202,13 @@
       btnProcess: "Schriftarten reparieren",
       btnDownload: "Reparierte Datei herunterladen",
       btnReset: "Weitere Datei verarbeiten",
-      statusUploading: "Datei wird hochgeladen...",
-      statusProcessing: "Verarbeitung — Schriftarten werden repariert...",
+      statusReading: "Datei wird gelesen...",
+      statusUnpacking: "PPTX-Archiv wird entpackt...",
+      statusThemes: "Themes reparieren",
+      statusSlides: "Folien reparieren",
+      statusLayouts: "Layouts reparieren",
+      statusMasters: "Master reparieren",
+      statusCompressing: "Reparierte Datei wird komprimiert...",
       statusDone: "Fertig! Ihre Datei ist bereit.",
       statusError: "Verarbeitung fehlgeschlagen",
       featuresLabel: "So funktioniert es",
@@ -193,7 +219,7 @@
       step2Text: "Wir normalisieren Schriftarten in Folien, Layouts, Mastern und Designs. CJK-Probleme und Theme-Referenzen werden behoben.",
       step3Title: "Herunterladen",
       step3Text: "Erhalten Sie Ihre reparierte Datei sofort. Alle temporären Daten werden direkt nach der Verarbeitung gelöscht.",
-      privacy: "Ihre Dateien werden auf dem Server verarbeitet und sofort danach gelöscht. Nichts wird gespeichert, protokolliert oder weitergegeben.",
+      privacy: "Ihre Dateien verlassen Ihr Gerät nicht. Die gesamte Verarbeitung erfolgt direkt in Ihrem Browser — nichts wird auf einen Server hochgeladen.",
       donateHeadline1: "Das dauert Stunden.",
       donateHeadline2: "Ihre Spende ist ",
       donateFuel: "Treibstoff",
@@ -221,8 +247,13 @@
       btnProcess: "Arreglar fuentes",
       btnDownload: "Descargar archivo arreglado",
       btnReset: "Procesar otro archivo",
-      statusUploading: "Subiendo archivo...",
-      statusProcessing: "Procesando — arreglando fuentes...",
+      statusReading: "Leyendo archivo...",
+      statusUnpacking: "Descomprimiendo archivo PPTX...",
+      statusThemes: "Arreglando temas",
+      statusSlides: "Arreglando diapositivas",
+      statusLayouts: "Arreglando diseños",
+      statusMasters: "Arreglando maestros",
+      statusCompressing: "Comprimiendo archivo arreglado...",
       statusDone: "¡Listo! Tu archivo está preparado.",
       statusError: "Error de procesamiento",
       featuresLabel: "Cómo funciona",
@@ -233,7 +264,7 @@
       step2Text: "Normalizamos las fuentes en diapositivas, diseños, maestros y temas. Arreglamos problemas CJK y referencias de temas.",
       step3Title: "Descargar",
       step3Text: "Obtén tu archivo arreglado al instante. Todos los datos temporales se eliminan justo después del procesamiento.",
-      privacy: "Tus archivos se procesan en el servidor y se eliminan inmediatamente. No se almacena, registra ni comparte nada.",
+      privacy: "Tus archivos no salen de tu dispositivo. Todo el procesamiento ocurre en tu navegador — nada se sube a ningún servidor.",
       donateHeadline1: "Esto lleva horas.",
       donateHeadline2: "Tu donación es ",
       donateFuel: "combustible",
@@ -261,8 +292,13 @@
       btnProcess: "Réparer les polices",
       btnDownload: "Télécharger le fichier réparé",
       btnReset: "Traiter un autre fichier",
-      statusUploading: "Téléchargement du fichier...",
-      statusProcessing: "Traitement — réparation des polices...",
+      statusReading: "Lecture du fichier...",
+      statusUnpacking: "Décompression de l'archive PPTX...",
+      statusThemes: "Réparation des thèmes",
+      statusSlides: "Réparation des diapositives",
+      statusLayouts: "Réparation des mises en page",
+      statusMasters: "Réparation des masques",
+      statusCompressing: "Compression du fichier réparé...",
       statusDone: "Terminé ! Votre fichier est prêt.",
       statusError: "Échec du traitement",
       featuresLabel: "Comment ça marche",
@@ -273,7 +309,7 @@
       step2Text: "Nous normalisons les polices dans les diapositives, mises en page, masques et thèmes. Correction des problèmes CJK et des références de thème.",
       step3Title: "Télécharger",
       step3Text: "Obtenez votre fichier réparé instantanément. Toutes les données temporaires sont supprimées juste après le traitement.",
-      privacy: "Vos fichiers sont traités sur le serveur et supprimés immédiatement après. Rien n'est stocké, enregistré ou partagé.",
+      privacy: "Vos fichiers ne quittent pas votre appareil. Tout le traitement se fait dans votre navigateur — rien n'est envoyé à un serveur.",
       donateHeadline1: "Cela prend des heures.",
       donateHeadline2: "Votre don est du ",
       donateFuel: "carburant",
@@ -303,11 +339,9 @@
       }
     });
 
-    // Update glitch data-text
     const glitch = document.querySelector(".glitch");
     if (glitch) glitch.setAttribute("data-text", "PowerPoint");
 
-    // Update lang switcher display
     document.getElementById("langCurrent").textContent = lang.toUpperCase();
     document.querySelectorAll(".lang-option").forEach((opt) => {
       opt.classList.toggle("active", opt.dataset.lang === lang);
@@ -335,7 +369,6 @@
     langSwitcher.classList.remove("open");
   });
 
-  // Apply saved language
   setLanguage(currentLang);
 
   // ─── DOM Elements ───────────────────────────────────────────
@@ -415,6 +448,152 @@
     downloadArea.classList.remove("visible");
   }
 
+  // ─── Client-side PPTX Processing ──────────────────────────
+
+  function isCJKLocale(lang) {
+    return lang.startsWith("zh") || lang.startsWith("ja") || lang.startsWith("ko") || lang === "yue";
+  }
+
+  function patchRunProperties(doc, tagName, targetFont) {
+    const elements = doc.getElementsByTagNameNS(NS_A, tagName);
+    for (let i = 0; i < elements.length; i++) {
+      const rPr = elements[i];
+
+      // Fix CJK language
+      const lang = rPr.getAttribute("lang");
+      if (lang && isCJKLocale(lang)) {
+        rPr.setAttribute("lang", "en-US");
+        rPr.removeAttribute("altLang");
+      }
+
+      // Remove existing font children
+      const toRemove = [];
+      for (let j = 0; j < rPr.childNodes.length; j++) {
+        const child = rPr.childNodes[j];
+        if (child.localName && ["latin", "ea", "cs", "sym"].includes(child.localName)) {
+          toRemove.push(child);
+        }
+      }
+      toRemove.forEach((c) => rPr.removeChild(c));
+
+      // Add explicit font
+      const latin = doc.createElementNS(NS_A, "a:latin");
+      latin.setAttribute("typeface", targetFont);
+      rPr.appendChild(latin);
+
+      const ea = doc.createElementNS(NS_A, "a:ea");
+      ea.setAttribute("typeface", targetFont);
+      rPr.appendChild(ea);
+    }
+  }
+
+  function normalizeXmlFonts(xmlString, targetFont) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlString, "text/xml");
+
+    patchRunProperties(doc, "rPr", targetFont);
+    patchRunProperties(doc, "defRPr", targetFont);
+    patchRunProperties(doc, "endParaRPr", targetFont);
+
+    let result = new XMLSerializer().serializeToString(doc);
+
+    result = result.replace(/typeface="\+mj-lt"/g, 'typeface="' + targetFont + '"');
+    result = result.replace(/typeface="\+mn-lt"/g, 'typeface="' + targetFont + '"');
+    result = result.replace(/typeface="\+mj-ea"/g, 'typeface="' + targetFont + '"');
+    result = result.replace(/typeface="\+mn-ea"/g, 'typeface="' + targetFont + '"');
+
+    return result;
+  }
+
+  function normalizeThemeFonts(xmlString, targetFont) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlString, "text/xml");
+
+    for (const fontGroup of ["majorFont", "minorFont"]) {
+      const group = doc.getElementsByTagNameNS(NS_A, fontGroup)[0];
+      if (!group) continue;
+
+      let latin = group.getElementsByTagNameNS(NS_A, "latin")[0];
+      if (!latin) {
+        latin = doc.createElementNS(NS_A, "a:latin");
+        group.insertBefore(latin, group.firstChild);
+      }
+      latin.setAttribute("typeface", targetFont);
+    }
+
+    return new XMLSerializer().serializeToString(doc);
+  }
+
+  async function processFile(file, targetFont, onProgress) {
+    const stats = { slides: 0, layouts: 0, masters: 0, themes: 0 };
+
+    onProgress("reading", 0, 1, 2);
+
+    const arrayBuffer = await file.arrayBuffer();
+    const data = new Uint8Array(arrayBuffer);
+
+    // Validate ZIP magic bytes
+    if (data[0] !== 0x50 || data[1] !== 0x4B) {
+      throw new Error("File is not a valid PPTX archive");
+    }
+
+    onProgress("unzip", 0, 1, 5);
+    const zip = await JSZip.loadAsync(data);
+    onProgress("unzip", 1, 1, 10);
+
+    // Themes
+    const themeFiles = Object.keys(zip.files).filter((f) => /^ppt\/theme\/theme\d+\.xml$/.test(f));
+    for (let i = 0; i < themeFiles.length; i++) {
+      onProgress("themes", i, themeFiles.length, 10 + (5 * i / Math.max(themeFiles.length, 1)));
+      const xml = await zip.file(themeFiles[i]).async("string");
+      zip.file(themeFiles[i], normalizeThemeFonts(xml, targetFont));
+      stats.themes++;
+    }
+
+    // Slides
+    const slideFiles = Object.keys(zip.files).filter((f) => /^ppt\/slides\/slide\d+\.xml$/.test(f));
+    for (let i = 0; i < slideFiles.length; i++) {
+      const pct = 15 + (45 * i / Math.max(slideFiles.length, 1));
+      onProgress("slides", i + 1, slideFiles.length, pct);
+      const xml = await zip.file(slideFiles[i]).async("string");
+      zip.file(slideFiles[i], normalizeXmlFonts(xml, targetFont));
+      stats.slides++;
+      // Yield to UI thread every 5 slides
+      if (i % 5 === 0) await new Promise((r) => setTimeout(r, 0));
+    }
+
+    // Layouts
+    const layoutFiles = Object.keys(zip.files).filter((f) => /^ppt\/slideLayouts\/slideLayout\d+\.xml$/.test(f));
+    for (let i = 0; i < layoutFiles.length; i++) {
+      const pct = 60 + (10 * i / Math.max(layoutFiles.length, 1));
+      onProgress("layouts", i + 1, layoutFiles.length, pct);
+      const xml = await zip.file(layoutFiles[i]).async("string");
+      zip.file(layoutFiles[i], normalizeXmlFonts(xml, targetFont));
+      stats.layouts++;
+    }
+
+    // Masters
+    const masterFiles = Object.keys(zip.files).filter((f) => /^ppt\/slideMasters\/slideMaster\d+\.xml$/.test(f));
+    for (let i = 0; i < masterFiles.length; i++) {
+      const pct = 70 + (5 * i / Math.max(masterFiles.length, 1));
+      onProgress("masters", i + 1, masterFiles.length, pct);
+      const xml = await zip.file(masterFiles[i]).async("string");
+      zip.file(masterFiles[i], normalizeXmlFonts(xml, targetFont));
+      stats.masters++;
+    }
+
+    onProgress("zip", 0, 1, 75);
+    const output = await zip.generateAsync(
+      { type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } },
+      (meta) => {
+        onProgress("zip", meta.percent, 100, 75 + (meta.percent * 0.25));
+      }
+    );
+    onProgress("zip", 100, 100, 100);
+
+    return { output, stats };
+  }
+
   // ─── Processing ─────────────────────────────────────────────
 
   btnProcess.addEventListener("click", async () => {
@@ -425,67 +604,25 @@
     downloadArea.classList.remove("visible");
 
     try {
-      // Step 1: Init chunked upload
-      showStatus("uploading", t.statusUploading + " (0%)", 0);
-
-      const initRes = await fetch("/api/upload/init", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: selectedFile.name,
-          fileSize: selectedFile.size,
-          targetFont: fontSelect.value,
-        }),
+      const { output, stats } = await processFile(selectedFile, fontSelect.value, (stage, current, total, percent) => {
+        const pct = Math.round(percent);
+        const msgs = {
+          reading: t.statusReading,
+          unzip: t.statusUnpacking,
+          themes: t.statusThemes + ` (${current}/${total})...`,
+          slides: t.statusSlides + ` (${current}/${total})...`,
+          layouts: t.statusLayouts + ` (${current}/${total})...`,
+          masters: t.statusMasters + ` (${current}/${total})...`,
+          zip: t.statusCompressing,
+        };
+        showStatus("processing", msgs[stage] || t.statusCompressing, pct);
       });
 
-      if (!initRes.ok) {
-        const err = await initRes.json().catch(() => ({ error: "Server error" }));
-        throw new Error(err.error || "Failed to initialize upload");
-      }
+      const baseName = selectedFile.name.replace(/\.pptx$/i, "");
+      resultBlob = output;
+      resultName = baseName + "-fixed.pptx";
 
-      const { jobId, chunkSize, totalChunks } = await initRes.json();
-
-      // Step 2: Upload chunks sequentially
-      for (let i = 0; i < totalChunks; i++) {
-        const start = i * chunkSize;
-        const end = Math.min(start + chunkSize, selectedFile.size);
-        const chunk = selectedFile.slice(start, end);
-
-        const uploadPercent = Math.round(((i + 1) / totalChunks) * 40);
-        showStatus("uploading", t.statusUploading + ` (${i + 1}/${totalChunks})`, uploadPercent);
-
-        const chunkRes = await fetch(`/api/upload/${jobId}/chunk/${i}`, {
-          method: "POST",
-          body: chunk,
-        });
-
-        if (!chunkRes.ok) {
-          const err = await chunkRes.json().catch(() => ({ error: "Chunk upload failed" }));
-          throw new Error(err.error || `Failed to upload chunk ${i + 1}`);
-        }
-      }
-
-      // Step 3: Poll for processing progress
-      showStatus("processing", t.statusProcessing, 42);
-
-      const jobResult = await pollJobStatus(jobId, t);
-
-      // Step 4: Download the result
-      showStatus("processing", t.statusDone.split("!")[0] + "!", 98);
-
-      const dlResponse = await fetch("/api/download/" + jobId);
-      if (!dlResponse.ok) {
-        const err = await dlResponse.json().catch(() => ({ error: "Download failed" }));
-        throw new Error(err.error || "Download failed");
-      }
-
-      resultBlob = await dlResponse.blob();
-      resultName = jobResult.fileName || selectedFile.name.replace(/\.pptx$/i, "-fixed.pptx");
-
-      if (jobResult.stats) {
-        const s = jobResult.stats;
-        statsText.textContent = `Fixed: ${s.themes} theme(s), ${s.masters} master(s), ${s.layouts} layout(s), ${s.slides} slide(s)`;
-      }
+      statsText.textContent = `Fixed: ${stats.themes} theme(s), ${stats.masters} master(s), ${stats.layouts} layout(s), ${stats.slides} slide(s)`;
 
       showStatus("done", t.statusDone, 100);
       downloadArea.classList.add("visible");
@@ -494,44 +631,6 @@
       btnProcess.disabled = false;
     }
   });
-
-  function pollJobStatus(jobId, t) {
-    return new Promise((resolve, reject) => {
-      let attempts = 0;
-      const maxAttempts = 600; // 5 minutes max (600 * 500ms)
-
-      const poll = async () => {
-        attempts++;
-        try {
-          const res = await fetch("/api/status/" + jobId);
-          if (!res.ok) {
-            reject(new Error(t.statusError));
-            return;
-          }
-
-          const data = await res.json();
-
-          if (data.status === "uploading" || data.status === "processing") {
-            showStatus("processing", data.message, data.percent);
-
-            if (attempts >= maxAttempts) {
-              reject(new Error("Processing timed out. Please try a smaller file."));
-              return;
-            }
-            setTimeout(poll, 500);
-          } else if (data.status === "done") {
-            resolve(data);
-          } else if (data.status === "error") {
-            reject(new Error(data.error || t.statusError));
-          }
-        } catch (err) {
-          reject(new Error(t.statusError));
-        }
-      };
-
-      poll();
-    });
-  }
 
   // ─── Download ───────────────────────────────────────────────
 
@@ -577,7 +676,6 @@
       statusIcon.textContent = "✕";
     }
 
-    // Show progress percentage for active states
     let progressBar = statusBar.querySelector(".progress-fill");
     if (type === "uploading" || type === "processing") {
       if (!progressBar) {
