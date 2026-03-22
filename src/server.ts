@@ -436,8 +436,12 @@ app.use("/*", async (c, next) => {
   await next();
 
   const path = new URL(c.req.url).pathname;
-  if (/\.(js|css|svg|png|jpg|jpeg|webp|ico|woff2?|ttf|eot)$/i.test(path)) {
+  if (/\.(svg|png|jpg|jpeg|webp|ico|woff2?|ttf|eot)$/i.test(path)) {
+    // Images and fonts — cache aggressively
     c.res.headers.set("Cache-Control", "public, max-age=86400, immutable");
+  } else if (/\.(js|css)$/i.test(path)) {
+    // JS/CSS — short cache, revalidate on deploy
+    c.res.headers.set("Cache-Control", "public, max-age=300, must-revalidate");
   } else if (path === "/" || path.endsWith(".html")) {
     c.res.headers.set("Cache-Control", "no-cache");
   }
