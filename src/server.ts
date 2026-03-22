@@ -246,12 +246,11 @@ app.get("/api/qr", async (c) => {
   });
 });
 
-// ─── Static files with cache headers ─────────────────────────────────────────
+// ─── Cache headers for static assets ─────────────────────────────────────────
 
 app.use("/*", async (c, next) => {
-  await serveStatic({ root: "./src/public" })(c, next);
+  await next();
 
-  // Add cache headers for static assets
   const path = new URL(c.req.url).pathname;
   if (/\.(js|css|svg|png|jpg|jpeg|webp|ico|woff2?|ttf|eot)$/i.test(path)) {
     c.res.headers.set("Cache-Control", "public, max-age=86400, immutable");
@@ -259,6 +258,10 @@ app.use("/*", async (c, next) => {
     c.res.headers.set("Cache-Control", "no-cache");
   }
 });
+
+// ─── Static files ────────────────────────────────────────────────────────────
+
+app.use("/*", serveStatic({ root: "./src/public" }));
 
 // ─── Catch-all: block unmatched routes ───────────────────────────────────────
 
