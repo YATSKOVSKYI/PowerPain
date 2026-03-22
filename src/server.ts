@@ -11,7 +11,7 @@ const WALLET_ADDRESS = "TBxEquczDy6ZSRPAyYrNbczoaP9YThaJuZ";
 const app = new Hono();
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
-const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
+const MAX_FILE_SIZE = 200 * 1024 * 1024; // 200 MB
 const TEMP_DIR = join(import.meta.dir, "..", "tmp");
 
 const ALLOWED_FONTS = [
@@ -28,9 +28,99 @@ const ALLOWED_FONTS = [
   "Inter",
 ];
 
+// ─── Rate limiter (per IP) ───────────────────────────────────────────────────
+
+const RATE_WINDOW_MS = 60 * 1000; // 1 minute
+const RATE_MAX_REQUESTS = 10; // max 10 uploads per minute per IP
+const rateBuckets = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const bucket = rateBuckets.get(ip);
+  if (!bucket || now > bucket.resetAt) {
+    rateBuckets.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
+  }
+  bucket.count++;
+  return bucket.count > RATE_MAX_REQUESTS;
+}
+
+// Clean up stale rate-limit buckets every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, bucket] of rateBuckets) {
+    if (now > bucket.resetAt) rateBuckets.delete(ip);
+  }
+}, 5 * 60 * 1000).unref();
+
 // Ensure temp directory exists
 await mkdir(TEMP_DIR, { recursive: true });
 startCleanupTimer(TEMP_DIR);
+
+// ─── Security headers ────────────────────────────────────────────────────────
+
+app.use("*", async (c, next) => {
+  await next();
+
+  // Prevent MIME-type sniffing
+  c.res.headers.set("X-Content-Type-Options", "nosniff");
+
+  // Clickjacking protection
+  c.res.headers.set("X-Frame-Options", "DENY");
+
+  // XSS filter (legacy browsers)
+  c.res.headers.set("X-XSS-Protection", "1; mode=block");
+
+  // Referrer policy — don't leak full URLs
+  c.res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+
+  // Restrict browser features
+  c.res.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  );
+
+  // Content Security Policy
+  c.res.headers.set(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "script-src 'self'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob:",
+      "font-src 'self'",
+      "connect-src 'self'",
+      "object-src 'none'",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join("; ")
+  );
+
+  // HSTS (browsers will enforce HTTPS for 1 year)
+  c.res.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+
+  // Hide server identity
+  c.res.headers.delete("X-Powered-By");
+  c.res.headers.delete("Server");
+});
+
+// ─── Block dotfile / sensitive path access ───────────────────────────────────
+
+app.use("*", async (c, next) => {
+  const path = new URL(c.req.url).pathname;
+
+  // Block access to hidden files, source maps, backups, configs
+  if (
+    /\/\./.test(path) ||
+    /\.(map|ts|env|log|bak|sql|sh|git)$/i.test(path) ||
+    /\/(node_modules|\.git|tmp)\//i.test(path)
+  ) {
+    return c.text("Not Found", 404);
+  }
+
+  await next();
+});
 
 // ─── API ────────────────────────────────────────────────────────────────────
 
@@ -39,6 +129,17 @@ app.post("/api/process", async (c) => {
   let tempInputPath: string | null = null;
 
   try {
+    // Rate limiting
+    const clientIp =
+      c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
+      c.req.header("x-real-ip") ||
+      "unknown";
+
+    if (isRateLimited(clientIp)) {
+      console.log(`[${requestId}] Rate limited: ${clientIp}`);
+      return c.json({ error: "Too many requests. Please try again later." }, 429);
+    }
+
     const contentType = c.req.header("content-type") || "";
     if (!contentType.includes("multipart/form-data")) {
       return c.json({ error: "Expected multipart/form-data" }, 400);
@@ -145,9 +246,23 @@ app.get("/api/qr", async (c) => {
   });
 });
 
-// ─── Static files ───────────────────────────────────────────────────────────
+// ─── Static files with cache headers ─────────────────────────────────────────
 
-app.use("/*", serveStatic({ root: "./src/public" }));
+app.use("/*", async (c, next) => {
+  await serveStatic({ root: "./src/public" })(c, next);
+
+  // Add cache headers for static assets
+  const path = new URL(c.req.url).pathname;
+  if (/\.(js|css|svg|png|jpg|jpeg|webp|ico|woff2?|ttf|eot)$/i.test(path)) {
+    c.res.headers.set("Cache-Control", "public, max-age=86400, immutable");
+  } else if (path === "/" || path.endsWith(".html")) {
+    c.res.headers.set("Cache-Control", "no-cache");
+  }
+});
+
+// ─── Catch-all: block unmatched routes ───────────────────────────────────────
+
+app.all("*", (c) => c.text("Not Found", 404));
 
 // ─── Start ──────────────────────────────────────────────────────────────────
 

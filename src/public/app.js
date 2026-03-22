@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const MAX_SIZE = 100 * 1024 * 1024;
+  const MAX_SIZE = 200 * 1024 * 1024;
   const WALLET = "TBxEquczDy6ZSRPAyYrNbczoaP9YThaJuZ";
 
   // ─── i18n ───────────────────────────────────────────────────
@@ -28,7 +28,7 @@
       featuresLabel: "How it works",
       featuresTitle: "Three simple steps",
       step1Title: "Upload",
-      step1Text: "Drag and drop your .pptx file or click to browse. Up to 100 MB.",
+      step1Text: "Drag and drop your .pptx file or click to browse. Up to 200 MB.",
       step2Title: "Process",
       step2Text: "We normalize fonts in slides, layouts, masters, and themes. Fix CJK issues and theme references.",
       step3Title: "Download",
@@ -68,7 +68,7 @@
       featuresLabel: "Как это работает",
       featuresTitle: "Три простых шага",
       step1Title: "Загрузите",
-      step1Text: "Перетащите ваш .pptx файл или нажмите для выбора. До 100 МБ.",
+      step1Text: "Перетащите ваш .pptx файл или нажмите для выбора. До 200 МБ.",
       step2Title: "Обработка",
       step2Text: "Мы нормализуем шрифты в слайдах, макетах, мастерах и темах. Исправляем CJK и ссылки тем.",
       step3Title: "Скачайте",
@@ -108,7 +108,7 @@
       featuresLabel: "Як це працює",
       featuresTitle: "Три простих кроки",
       step1Title: "Завантажте",
-      step1Text: "Перетягніть ваш .pptx файл або натисніть для вибору. До 100 МБ.",
+      step1Text: "Перетягніть ваш .pptx файл або натисніть для вибору. До 200 МБ.",
       step2Title: "Обробка",
       step2Text: "Ми нормалізуємо шрифти в слайдах, макетах, мастерах та темах. Виправляємо CJK та посилання тем.",
       step3Title: "Завантажте",
@@ -148,7 +148,7 @@
       featuresLabel: "工作原理",
       featuresTitle: "三个简单步骤",
       step1Title: "上传",
-      step1Text: "拖放您的 .pptx 文件或点击浏览。最大 100 MB。",
+      step1Text: "拖放您的 .pptx 文件或点击浏览。最大 200 MB。",
       step2Title: "处理",
       step2Text: "我们在幻灯片、布局、母版和主题中规范化字体。修复 CJK 问题和主题引用。",
       step3Title: "下载",
@@ -188,7 +188,7 @@
       featuresLabel: "So funktioniert es",
       featuresTitle: "Drei einfache Schritte",
       step1Title: "Hochladen",
-      step1Text: "Ziehen Sie Ihre .pptx-Datei per Drag & Drop oder klicken Sie zum Durchsuchen. Bis zu 100 MB.",
+      step1Text: "Ziehen Sie Ihre .pptx-Datei per Drag & Drop oder klicken Sie zum Durchsuchen. Bis zu 200 MB.",
       step2Title: "Verarbeiten",
       step2Text: "Wir normalisieren Schriftarten in Folien, Layouts, Mastern und Designs. CJK-Probleme und Theme-Referenzen werden behoben.",
       step3Title: "Herunterladen",
@@ -228,7 +228,7 @@
       featuresLabel: "Cómo funciona",
       featuresTitle: "Tres pasos simples",
       step1Title: "Subir",
-      step1Text: "Arrastra tu archivo .pptx o haz clic para buscar. Hasta 100 MB.",
+      step1Text: "Arrastra tu archivo .pptx o haz clic para buscar. Hasta 200 MB.",
       step2Title: "Procesar",
       step2Text: "Normalizamos las fuentes en diapositivas, diseños, maestros y temas. Arreglamos problemas CJK y referencias de temas.",
       step3Title: "Descargar",
@@ -268,7 +268,7 @@
       featuresLabel: "Comment ça marche",
       featuresTitle: "Trois étapes simples",
       step1Title: "Télécharger",
-      step1Text: "Glissez-déposez votre fichier .pptx ou cliquez pour parcourir. Jusqu'à 100 Mo.",
+      step1Text: "Glissez-déposez votre fichier .pptx ou cliquez pour parcourir. Jusqu'à 200 Mo.",
       step2Title: "Traiter",
       step2Text: "Nous normalisons les polices dans les diapositives, mises en page, masques et thèmes. Correction des problèmes CJK et des références de thème.",
       step3Title: "Télécharger",
@@ -401,7 +401,7 @@
     }
 
     if (file.size > MAX_SIZE) {
-      showStatus("error", t.statusError + ": file too large (max 100 MB)");
+      showStatus("error", t.statusError + ": file too large (max 200 MB)");
       return;
     }
 
