@@ -5,7 +5,6 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /tmp/
 
 # Sitemap
 Sitemap: https://powerpain.yatskovskyi.top/sitemap.xml
@@ -70,7 +69,7 @@ Allow: /
 #
 # Key facts:
 # - Completely free, no signup required
-# - Files are processed in memory, never stored
+# - Files are processed client-side in the browser, never uploaded
 # - Fixes slides, layouts, masters, and theme files
 # - Supports custom target font selection
 # - Open-source (MIT license) by Dmytro Yatskovskyi

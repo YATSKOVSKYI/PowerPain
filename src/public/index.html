@@ -105,7 +105,7 @@
         "name": "Are my files stored on the server?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No. Files are processed in memory and never saved to disk. All temporary data is deleted immediately after processing completes."
+          "text": "No. All processing happens entirely in your browser using JavaScript. Your files never leave your device — nothing is uploaded to any server."
         }
       }
     ]
@@ -376,7 +376,7 @@
     <div class="container">
       <div class="privacy__card">
         <svg class="privacy__icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"/></svg>
-        <span data-i18n="privacy">Your files are processed on the server and deleted immediately after. Nothing is stored, logged, or shared.</span>
+        <span data-i18n="privacy">Your files never leave your device. All processing happens right in your browser — nothing is uploaded to any server.</span>
       </div>
     </div>
   </section>
@@ -386,7 +386,7 @@
     <div class="container">
       <div class="donate__banner">
         <div class="donate__photo-wrap" id="photoWrap">
-          <img src="/img/donate-photo.webp" alt="Support the developer" class="donate__photo" onerror="document.getElementById('photoWrap').classList.add('hidden')">
+          <img src="/img/donate-photo.webp" alt="Support the developer" class="donate__photo" id="donatePhoto">
         </div>
         <h2 class="donate__headline">
           <span data-i18n="donateHeadline1">This takes hours.</span><br>

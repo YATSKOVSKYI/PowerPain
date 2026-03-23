@@ -412,6 +412,15 @@
   let resultBlob = null;
   let resultName = "";
 
+  // ─── Donate photo fallback ────────────────────────────────
+  const donatePhoto = document.getElementById("donatePhoto");
+  if (donatePhoto) {
+    donatePhoto.addEventListener("error", () => {
+      const wrap = document.getElementById("photoWrap");
+      if (wrap) wrap.classList.add("hidden");
+    });
+  }
+
   // ─── File Selection ─────────────────────────────────────────
 
   dropzone.addEventListener("click", () => {
@@ -692,7 +701,10 @@
     statusBar.className = "status-bar " + type;
 
     if (type === "uploading" || type === "processing") {
-      statusIcon.innerHTML = '<div class="spinner"></div>';
+      statusIcon.textContent = "";
+      const spinner = document.createElement("div");
+      spinner.className = "spinner";
+      statusIcon.appendChild(spinner);
     } else if (type === "done") {
       statusIcon.textContent = "✓";
     } else {

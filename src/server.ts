@@ -20,8 +20,8 @@ app.use("*", async (c, next) => {
   // Clickjacking protection
   c.res.headers.set("X-Frame-Options", "DENY");
 
-  // XSS filter (legacy browsers)
-  c.res.headers.set("X-XSS-Protection", "1; mode=block");
+  // Disable legacy XSS filter (deprecated, can introduce vulnerabilities)
+  c.res.headers.set("X-XSS-Protection", "0");
 
   // Referrer policy — don't leak full URLs
   c.res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -49,8 +49,8 @@ app.use("*", async (c, next) => {
     ].join("; ")
   );
 
-  // HSTS (browsers will enforce HTTPS for 1 year)
-  c.res.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  // HSTS (browsers will enforce HTTPS for 1 year, eligible for preload list)
+  c.res.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 
   // Hide server identity
   c.res.headers.delete("X-Powered-By");
@@ -88,12 +88,9 @@ app.get("/api/qr", async (c) => {
       width: 256,
     });
   }
-  return new Response(qrCache, {
-    headers: {
-      "Content-Type": "image/svg+xml",
-      "Cache-Control": "public, max-age=86400",
-    },
-  });
+  c.header("Content-Type", "image/svg+xml");
+  c.header("Cache-Control", "public, max-age=86400");
+  return c.body(qrCache);
 });
 
 // ─── Cache headers for static assets ─────────────────────────────────────────

@@ -56,10 +56,11 @@ PowerPoint silently ignores your font changes in these common scenarios:
 ## Features
 
 - **One-click fix** — upload `.pptx`, get fixed file back
+- **100% client-side** — all processing runs in your browser via JSZip + DOMParser, files never leave your device
 - **Deep normalization** — processes `a:rPr`, `a:defRPr`, `a:endParaRPr` across all XML files
 - **Theme repair** — fixes `majorFont`/`minorFont` in theme files
 - **11 font choices** — Arial, Calibri, Times New Roman, Helvetica, Verdana, Tahoma, Georgia, Segoe UI, Roboto, Open Sans, Inter
-- **Zero storage** — files processed in memory, never saved to disk
+- **Zero upload** — nothing is sent to any server, ever
 - **7 languages** — EN, RU, UK, ZH, DE, ES, FR
 - **Privacy-first** — no accounts, no tracking, no analytics
 - **Modern UI** — dark theme, PowerPoint color palette, responsive design
@@ -69,8 +70,8 @@ PowerPoint silently ignores your font changes in these common scenarios:
 | Layer | Technology | Why |
 |-------|-----------|-----|
 | Runtime | [Bun](https://bun.sh) | Fastest JS runtime, native TypeScript |
-| Backend | [Hono](https://hono.dev) | 14KB, fastest Bun-native HTTP framework |
-| PPTX Processing | [JSZip](https://stuk.github.io/jszip/) + [@xmldom/xmldom](https://github.com/xmldom/xmldom) | Lightweight ZIP + XML manipulation |
+| Static Server | [Hono](https://hono.dev) | 14KB, fastest Bun-native HTTP framework |
+| PPTX Processing | [JSZip](https://stuk.github.io/jszip/) + DOMParser (browser) | Client-side ZIP + XML manipulation, no server needed |
 | Frontend | Vanilla HTML/CSS/JS | No framework overhead for a single page |
 | QR Code | [qrcode](https://github.com/soldair/node-qrcode) | MIT-licensed, SVG generation |
 
@@ -103,47 +104,39 @@ bun run dev
 ```
 PowerPain/
 ├── src/
-│   ├── server.ts              # Hono server, API routes, static files
-│   ├── pptx-normalizer.ts     # Core PPTX font normalization engine
-│   ├── cleanup.ts             # TTL cleaner for orphan temp files
+│   ├── server.ts              # Hono server — static files, QR API, security headers
 │   └── public/
 │       ├── index.html          # Single-page UI with full SEO
 │       ├── style.css           # Dark theme, PowerPoint palette
-│       ├── app.js              # i18n, drag&drop, upload logic
+│       ├── app.js              # Client-side PPTX processing, i18n, drag&drop
+│       ├── jszip.min.js        # JSZip library for in-browser ZIP handling
+│       ├── 404.html            # Custom 404 page
 │       ├── robots.txt          # Search engine + AI bot rules
 │       ├── sitemap.xml         # XML sitemap
-│       └── .well-known/
-│           └── ai-plugin.json  # AI plugin manifest
+│       └── img/                # Favicon, OG image, donate photo
 ├── package.json
 ├── tsconfig.json
 ├── LICENSE                     # MIT
 └── README.md
 ```
 
-## API
+## Architecture
 
-### `POST /api/process`
+All PPTX processing happens **entirely in the browser**. The server only serves static files and the donation QR code.
 
-Upload a `.pptx` file, receive the fixed version.
+### How client-side processing works
 
-```bash
-curl -X POST http://localhost:3000/api/process \
-  -F "file=@presentation.pptx" \
-  -F "targetFont=Arial" \
-  -o fixed.pptx
-```
+1. User drops a `.pptx` file
+2. `JSZip` unpacks the archive in the browser
+3. `DOMParser` parses each XML file (slides, layouts, masters, themes)
+4. JavaScript normalizes fonts: fixes `lang` attributes, replaces theme references (`+mj-lt`, `+mn-lt`), sets explicit `<a:latin>` and `<a:ea>` typefaces
+5. `XMLSerializer` converts the DOM back to XML strings
+6. `JSZip` repacks everything into a new `.pptx` blob
+7. User downloads the fixed file — nothing was ever uploaded
 
-**Parameters:**
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `file` | File | Yes | `.pptx` file (max 100 MB) |
-| `targetFont` | String | No | Target font name (default: `Arial`) |
+### Server API
 
-**Response:** Fixed `.pptx` file as download, with `X-Stats` header containing processing statistics.
-
-### `GET /api/fonts`
-
-Returns the list of available target fonts.
+The server is minimal — it only has one API endpoint:
 
 ### `GET /api/qr`
 
@@ -163,6 +156,14 @@ Returns the donation QR code as SVG.
 4. Open in PowerPoint — fonts should now be changeable
 5. Check: `lang` attributes should be `en-US`, no `+mj-lt` references remain
 
+## Security
+
+- **CSP** — strict Content-Security-Policy (self + Google Fonts only)
+- **HSTS** — enforced HTTPS with 1-year max-age
+- **X-Frame-Options: DENY** — clickjacking protection
+- **No server processing** — zero attack surface for file uploads
+- **Rate limiting** — dotfile / sensitive path blocking
+
 ## SEO & Discoverability
 
 - Full meta tags (OG, Twitter Card, JSON-LD)
@@ -171,7 +172,6 @@ Returns the donation QR code as SVG.
 - Hreflang tags for 7 languages
 - XML sitemap
 - `robots.txt` with AI crawler instructions
-- `.well-known/ai-plugin.json` manifest
 
 ## Contributing
 
