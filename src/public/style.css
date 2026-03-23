@@ -1172,66 +1172,57 @@ a:hover { color: var(--primary-hover); }
   background: var(--surface-border);
 }
 
-/* ─── Pain Killer (scroll to top) ────────────────────────────── */
+/* ─── Scroll to top ──────────────────────────────────────────── */
 
-.painkiller {
+.scroll-top {
   position: fixed;
   bottom: 28px;
   right: 28px;
-  z-index: 99;
+  z-index: 10001;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px 10px 10px;
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  border-radius: 100px;
-  color: var(--primary);
-  cursor: pointer;
-  font-family: var(--font);
+  justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(20px);
-  transition: all 0.3s var(--ease);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  transform: translateY(12px);
+  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease), visibility 0.35s,
+              background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.painkiller.visible {
+.scroll-top.visible {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
 
-.painkiller:hover {
+.scroll-top svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.25s var(--ease-spring);
+}
+
+.scroll-top:hover {
+  background: var(--surface-hover);
   border-color: var(--primary);
-  background: rgba(196, 62, 28, 0.12);
+  color: var(--primary);
+  box-shadow: 0 0 16px var(--primary-glow);
+}
+
+.scroll-top:hover svg {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(196, 62, 28, 0.2);
 }
 
-.painkiller:hover svg {
-  animation: pill-bounce 0.5s var(--ease-spring);
-}
-
-@keyframes pill-bounce {
-  0%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-4px); }
-  60% { transform: translateY(-2px); }
-}
-
-.painkiller svg {
-  flex-shrink: 0;
-  transition: transform 0.2s var(--ease);
-}
-
-.painkiller__label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  white-space: nowrap;
+.scroll-top:active {
+  transform: scale(0.92);
+  transition-duration: 0.08s;
 }
 
 /* ─── Responsive ─────────────────────────────────────────────── */

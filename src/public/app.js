@@ -51,7 +51,6 @@
       btnCopy: "Copy",
       warningLabel: "Warning:",
       warningText: " send only TRON network assets to this address.",
-      painkiller: "pain killer",
     },
     ru: {
       badge: "Open-source инструмент",
@@ -96,7 +95,6 @@
       btnCopy: "Копировать",
       warningLabel: "Внимание:",
       warningText: " отправляйте только активы сети TRON на этот адрес.",
-      painkiller: "обезбол",
     },
     uk: {
       badge: "Open-source інструмент",
@@ -141,7 +139,6 @@
       btnCopy: "Копіювати",
       warningLabel: "Увага:",
       warningText: " відправляйте тільки активи мережі TRON на цю адресу.",
-      painkiller: "знеболююче",
     },
     zh: {
       badge: "开源工具",
@@ -186,7 +183,6 @@
       btnCopy: "复制",
       warningLabel: "警告：",
       warningText: "仅向此地址发送 TRON 网络资产。",
-      painkiller: "止痛药",
     },
     de: {
       badge: "Open-Source-Tool",
@@ -231,7 +227,6 @@
       btnCopy: "Kopieren",
       warningLabel: "Achtung:",
       warningText: " senden Sie nur TRON-Netzwerk-Assets an diese Adresse.",
-      painkiller: "Schmerzmittel",
     },
     es: {
       badge: "Herramienta open-source",
@@ -276,7 +271,6 @@
       btnCopy: "Copiar",
       warningLabel: "Advertencia:",
       warningText: " envía solo activos de la red TRON a esta dirección.",
-      painkiller: "analgésico",
     },
     fr: {
       badge: "Outil open-source",
@@ -321,11 +315,12 @@
       btnCopy: "Copier",
       warningLabel: "Attention :",
       warningText: " envoyez uniquement des actifs du réseau TRON à cette adresse.",
-      painkiller: "antidouleur",
     },
   };
 
   let currentLang = localStorage.getItem("pp-lang") || "en";
+  let currentStatusType = null;
+  let currentStatusKey = null;
 
   function setLanguage(lang) {
     currentLang = lang;
@@ -346,6 +341,28 @@
     document.querySelectorAll(".lang-option").forEach((opt) => {
       opt.classList.toggle("active", opt.dataset.lang === lang);
     });
+
+    // Update current status text if visible
+    if (currentStatusType && currentStatusKey) {
+      const statusKeyMap = {
+        reading: "statusReading",
+        unzip: "statusUnpacking",
+        themes: "statusThemes",
+        slides: "statusSlides",
+        layouts: "statusLayouts",
+        masters: "statusMasters",
+        zip: "statusCompressing",
+        statusDone: "statusDone",
+        statusError: "statusError",
+      };
+      const translationKey = statusKeyMap[currentStatusKey] || currentStatusKey;
+      if (t[translationKey]) {
+        const statusTextEl = document.getElementById("statusText");
+        if (statusTextEl) {
+          statusTextEl.textContent = t[translationKey];
+        }
+      }
+    }
   }
 
   // ─── Language Switcher ──────────────────────────────────────
@@ -615,6 +632,8 @@
           masters: t.statusMasters + ` (${current}/${total})...`,
           zip: t.statusCompressing,
         };
+        currentStatusType = "processing";
+        currentStatusKey = stage;
         showStatus("processing", msgs[stage] || t.statusCompressing, pct);
       });
 
@@ -624,9 +643,13 @@
 
       statsText.textContent = `Fixed: ${stats.themes} theme(s), ${stats.masters} master(s), ${stats.layouts} layout(s), ${stats.slides} slide(s)`;
 
+      currentStatusType = "done";
+      currentStatusKey = "statusDone";
       showStatus("done", t.statusDone, 100);
       downloadArea.classList.add("visible");
     } catch (err) {
+      currentStatusType = "error";
+      currentStatusKey = "statusError";
       showStatus("error", err.message || t.statusError);
       btnProcess.disabled = false;
     }
@@ -704,6 +727,8 @@
     selectedFile = null;
     resultBlob = null;
     resultName = "";
+    currentStatusType = null;
+    currentStatusKey = null;
     fileInput.value = "";
     fileInfo.classList.remove("visible");
     dropzone.classList.remove("has-file");
@@ -718,19 +743,22 @@
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   }
 
-  // ─── Pain Killer (scroll to top) ────────────────────────────
+  // ─── Scroll to Top ─────────────────────────────────────────
+  {
+    const scrollBtn = document.getElementById("scrollTop");
+    if (scrollBtn) {
+      let visible = false;
+      window.addEventListener("scroll", () => {
+        const show = window.scrollY > 400;
+        if (show !== visible) {
+          visible = show;
+          scrollBtn.classList.toggle("visible", show);
+        }
+      }, { passive: true });
 
-  const painkiller = document.getElementById("painkiller");
-
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 600) {
-      painkiller.classList.add("visible");
-    } else {
-      painkiller.classList.remove("visible");
+      scrollBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
     }
-  }, { passive: true });
-
-  painkiller.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+  }
 })();
